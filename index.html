@@ -116,118 +116,120 @@
   <button class="btn-export" id="exportBtn">Export to Excel</button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script>
-    const form = document.getElementById('foodForm');
-    const tableBody = document.querySelector('#foodTable tbody');
-    const exportBtn = document.getElementById('exportBtn');
-    const dateInput = document.getElementById('date');
-    const timeInput = document.getElementById('time');
-    const photoInput = document.getElementById('photo');
+ <script>
+  const form = document.getElementById('foodForm');
+  const tableBody = document.querySelector('#foodTable tbody');
+  const exportBtn = document.getElementById('exportBtn');
+  const dateInput = document.getElementById('date');
+  const timeInput = document.getElementById('time');
+  const photoInput = document.getElementById('photo');
 
-    const now = new Date();
-    dateInput.valueAsDate = now;
-    timeInput.value = now.toTimeString().slice(0,5);
+  const now = new Date();
+  dateInput.valueAsDate = now;
+  timeInput.value = now.toTimeString().slice(0,5);
 
-    let entries = JSON.parse(localStorage.getItem('foodEntries')) || [];
-    let editIndex = null;
+  let entries = JSON.parse(localStorage.getItem('foodEntries')) || [];
+  let editIndex = null;
 
+  renderTable();
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const file = photoInput.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        saveEntry(event.target.result); // call after file is loaded
+      };
+      reader.readAsDataURL(file);
+    } else {
+      saveEntry(null); // no photo, save immediately
+    }
+  });
+
+  function saveEntry(photoData) {
+    const entry = {
+      date: dateInput.value,
+      time: timeInput.value,
+      mood: document.getElementById('mood').value,
+      reason: document.getElementById('reason').value,
+      hunger: document.getElementById('hunger').value,
+      calories: document.getElementById('calories').value,
+      notes: document.getElementById('notes').value,
+      photo: photoData
+    };
+
+    if (editIndex === null) {
+      entries.push(entry);
+    } else {
+      entries[editIndex] = entry;
+      editIndex = null;
+    }
+
+    localStorage.setItem('foodEntries', JSON.stringify(entries));
     renderTable();
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
+    form.reset();
+    dateInput.valueAsDate = new Date();
+    timeInput.value = new Date().toTimeString().slice(0,5);
+  }
 
-      const file = photoInput.files[0];
-
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          saveEntry(event.target.result);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        saveEntry(null);
-      }
+  function renderTable() {
+    tableBody.innerHTML = '';
+    entries.forEach((entry, index) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${entry.date}</td>
+        <td>${entry.time}</td>
+        <td>${entry.mood}</td>
+        <td>${entry.reason}</td>
+        <td>${entry.hunger}</td>
+        <td>${entry.calories}</td>
+        <td>${entry.notes}</td>
+        <td>${entry.photo ? `<img src="${entry.photo}" class="photo-thumb" />` : ''}</td>
+        <td>
+          <button onclick="editEntry(${index})">Edit</button>
+          <button onclick="deleteEntry(${index})">Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
     });
+  }
 
-    function saveEntry(photoData) {
-      const entry = {
-        date: dateInput.value,
-        time: timeInput.value,
-        mood: document.getElementById('mood').value,
-        reason: document.getElementById('reason').value,
-        hunger: document.getElementById('hunger').value,
-        calories: document.getElementById('calories').value,
-        notes: document.getElementById('notes').value,
-        photo: photoData
-      };
+  function editEntry(index) {
+    const entry = entries[index];
+    dateInput.value = entry.date;
+    timeInput.value = entry.time;
+    document.getElementById('mood').value = entry.mood;
+    document.getElementById('reason').value = entry.reason;
+    document.getElementById('hunger').value = entry.hunger;
+    document.getElementById('calories').value = entry.calories;
+    document.getElementById('notes').value = entry.notes;
+    editIndex = index;
+  }
 
-      if (editIndex === null) {
-        entries.push(entry);
-      } else {
-        entries[editIndex] = entry;
-        editIndex = null;
-      }
-
+  function deleteEntry(index) {
+    if (confirm("Are you sure you want to delete this entry?")) {
+      entries.splice(index, 1);
       localStorage.setItem('foodEntries', JSON.stringify(entries));
       renderTable();
-      form.reset();
-      dateInput.valueAsDate = new Date();
-      timeInput.value = new Date().toTimeString().slice(0,5);
     }
+  }
 
-    function renderTable() {
-      tableBody.innerHTML = '';
-      entries.forEach((entry, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${entry.date}</td>
-          <td>${entry.time}</td>
-          <td>${entry.mood}</td>
-          <td>${entry.reason}</td>
-          <td>${entry.hunger}</td>
-          <td>${entry.calories}</td>
-          <td>${entry.notes}</td>
-          <td>${entry.photo ? `<img src="${entry.photo}" class="photo-thumb" />` : ''}</td>
-          <td>
-            <button onclick="editEntry(${index})">Edit</button>
-            <button onclick="deleteEntry(${index})">Delete</button>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
-
-    function editEntry(index) {
-      const entry = entries[index];
-      dateInput.value = entry.date;
-      timeInput.value = entry.time;
-      document.getElementById('mood').value = entry.mood;
-      document.getElementById('reason').value = entry.reason;
-      document.getElementById('hunger').value = entry.hunger;
-      document.getElementById('calories').value = entry.calories;
-      document.getElementById('notes').value = entry.notes;
-      editIndex = index;
-    }
-
-    function deleteEntry(index) {
-      if (confirm("Are you sure you want to delete this entry?")) {
-        entries.splice(index, 1);
-        localStorage.setItem('foodEntries', JSON.stringify(entries));
-        renderTable();
-      }
-    }
-
-    exportBtn.addEventListener('click', function() {
-      const exportEntries = entries.map(entry => {
-        const e = { ...entry };
-        if (e.photo) e.photo = '[Image]';
-        return e;
-      });
-      const worksheet = XLSX.utils.json_to_sheet(exportEntries);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Food Diary');
-      XLSX.writeFile(workbook, 'food-diary.xlsx');
+  exportBtn.addEventListener('click', function() {
+    const exportEntries = entries.map(entry => {
+      const e = { ...entry };
+      if (e.photo) e.photo = '[Image]';
+      return e;
     });
-  </script>
+    const worksheet = XLSX.utils.json_to_sheet(exportEntries);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Food Diary');
+    XLSX.writeFile(workbook, 'food-diary.xlsx');
+  });
+</script>
+
 </body>
 </html>
