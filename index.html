@@ -95,55 +95,89 @@
   <!-- SheetJS library for Excel export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   
-  <script>
-    const form = document.getElementById('foodForm');
-    const tableBody = document.querySelector('#foodTable tbody');
-    const exportBtn = document.getElementById('exportBtn');
+<script>
+  const form = document.getElementById('foodForm');
+  const tableBody = document.querySelector('#foodTable tbody');
+  const exportBtn = document.getElementById('exportBtn');
 
-    // Set today's date as default
-    const dateInput = document.getElementById('date');
-    dateInput.valueAsDate = new Date();
+  // Set today's date as default
+  const dateInput = document.getElementById('date');
+  dateInput.valueAsDate = new Date();
 
-    // Load existing entries from localStorage
-    let entries = JSON.parse(localStorage.getItem('foodEntries')) || [];
-    renderTable();
+  // Load existing entries from localStorage
+  let entries = JSON.parse(localStorage.getItem('foodEntries')) || [];
+  let editIndex = null; // track which entry is being edited
+  renderTable();
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const entry = {
-        date: document.getElementById('date').value,
-        meal: document.getElementById('meal').value,
-        calories: document.getElementById('calories').value,
-        notes: document.getElementById('notes').value
-      };
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const entry = {
+      date: document.getElementById('date').value,
+      meal: document.getElementById('meal').value,
+      calories: document.getElementById('calories').value,
+      notes: document.getElementById('notes').value
+    };
+
+    if (editIndex === null) {
+      // Add new entry
       entries.push(entry);
-      localStorage.setItem('foodEntries', JSON.stringify(entries));
-      renderTable();
-      form.reset();
-    });
-
-    function renderTable() {
-      tableBody.innerHTML = '';
-      entries.forEach(entry => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${entry.date}</td>
-          <td>${entry.meal}</td>
-          <td>${entry.calories}</td>
-          <td>${entry.notes}</td>
-        `;
-        tableBody.appendChild(row);
-      });
+    } else {
+      // Update existing entry
+      entries[editIndex] = entry;
+      editIndex = null;
     }
 
-    exportBtn.addEventListener('click', function() {
-      // Convert entries to worksheet
-      const worksheet = XLSX.utils.json_to_sheet(entries);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Food Diary');
-      // Save file
-      XLSX.writeFile(workbook, 'food-diary.xlsx');
+    localStorage.setItem('foodEntries', JSON.stringify(entries));
+    renderTable();
+    form.reset();
+    dateInput.valueAsDate = new Date(); // reset to today
+  });
+
+  function renderTable() {
+    tableBody.innerHTML = '';
+    entries.forEach((entry, index) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${entry.date}</td>
+        <td>${entry.meal}</td>
+        <td>${entry.calories}</td>
+        <td>${entry.notes}</td>
+        <td>
+          <button onclick="editEntry(${index})">Edit</button>
+          <button onclick="deleteEntry(${index})">Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
     });
-  </script>
+  }
+
+  // Edit an entry
+  function editEntry(index) {
+    const entry = entries[index];
+    document.getElementById('date').value = entry.date;
+    document.getElementById('meal').value = entry.meal;
+    document.getElementById('calories').value = entry.calories;
+    document.getElementById('notes').value = entry.notes;
+    editIndex = index; // mark which entry we’re editing
+  }
+
+  // Delete an entry
+  function deleteEntry(index) {
+    if (confirm("Are you sure you want to delete this entry?")) {
+      entries.splice(index, 1);
+      localStorage.setItem('foodEntries', JSON.stringify(entries));
+      renderTable();
+    }
+  }
+
+  exportBtn.addEventListener('click', function() {
+    const worksheet = XLSX.utils.json_to_sheet(entries);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Food Diary');
+    XLSX.writeFile(workbook, 'food-diary.xlsx');
+  });
+</script>
+
+
 </body>
 </html>
