@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Food Diary</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      margin-bottom: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background: #eee;
+    }
+    .btn-export {
+      margin-top: 20px;
+      padding: 10px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-export:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍎 My Food Diary</h1>
+
+  <form id="foodForm">
+    <label>Date:
+      <input type="date" id="date" required />
+    </label>
+    <label>Meal:
+      <input type="text" id="meal" placeholder="e.g. Breakfast" required />
+    </label>
+    <label>Calories:
+      <input type="number" id="calories" placeholder="e.g. 500" />
+    </label>
+    <label>Notes:
+      <textarea id="notes" placeholder="e.g. eggs, toast, coffee"></textarea>
+    </label>
+    <button type="submit">Save Entry</button>
+  </form>
+
+  <table id="foodTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Meal</th>
+        <th>Calories</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <button class="btn-export" id="exportBtn">Export to Excel</button>
+
+  <!-- SheetJS library for Excel export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
+  <script>
+    const form = document.getElementById('foodForm');
+    const tableBody = document.querySelector('#foodTable tbody');
+    const exportBtn = document.getElementById('exportBtn');
+
+    // Load existing entries from localStorage
+    let entries = JSON.parse(localStorage.getItem('foodEntries')) || [];
+    renderTable();
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const entry = {
+        date: document.getElementById('date').value,
+        meal: document.getElementById('meal').value,
+        calories: document.getElementById('calories').value,
+        notes: document.getElementById('notes').value
+      };
+      entries.push(entry);
+      localStorage.setItem('foodEntries', JSON.stringify(entries));
+      renderTable();
+      form.reset();
+    });
+
+    function renderTable() {
+      tableBody.innerHTML = '';
+      entries.forEach(entry => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${entry.date}</td>
+          <td>${entry.meal}</td>
+          <td>${entry.calories}</td>
+          <td>${entry.notes}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    exportBtn.addEventListener('click', function() {
+      // Convert entries to worksheet
+      const worksheet = XLSX.utils.json_to_sheet(entries);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Food Diary');
+      // Save file
+      XLSX.writeFile(workbook, 'food-diary.xlsx');
+    });
+  </script>
+</body>
+</html>
