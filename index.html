@@ -111,8 +111,14 @@
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
+
+    // Get current time in local timezone
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
     const entry = {
       date: document.getElementById('date').value,
+      time: timeString, // store local time
       meal: document.getElementById('meal').value,
       calories: document.getElementById('calories').value,
       notes: document.getElementById('notes').value
@@ -138,7 +144,7 @@
     entries.forEach((entry, index) => {
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${entry.date}</td>
+        <td>${entry.date} ${entry.time || ''}</td>
         <td>${entry.meal}</td>
         <td>${entry.calories}</td>
         <td>${entry.notes}</td>
