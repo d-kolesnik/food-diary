@@ -24,7 +24,7 @@
       display: block;
       margin-top: 10px;
     }
-    input, textarea, button {
+    input, textarea, button, select {
       width: 100%;
       padding: 8px;
       margin-top: 5px;
@@ -66,8 +66,17 @@
     <label>Date:
       <input type="date" id="date" required />
     </label>
-    <label>Meal:
-      <input type="text" id="meal" placeholder="e.g. Breakfast" required />
+    <label>Time:
+      <input type="time" id="time" required />
+    </label>
+    <label>Mood before eating:
+      <input type="text" id="mood" placeholder="e.g. Happy, Tired" />
+    </label>
+    <label>Reason to eat:
+      <input type="text" id="reason" placeholder="e.g. Hunger, Boredom" />
+    </label>
+    <label>Hunger level (1-10):
+      <input type="number" id="hunger" min="1" max="10" />
     </label>
     <label>Calories:
       <input type="number" id="calories" placeholder="e.g. 500" />
@@ -82,9 +91,13 @@
     <thead>
       <tr>
         <th>Date</th>
-        <th>Meal</th>
+        <th>Time</th>
+        <th>Mood</th>
+        <th>Reason</th>
+        <th>Hunger</th>
         <th>Calories</th>
         <th>Notes</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -100,9 +113,12 @@
   const tableBody = document.querySelector('#foodTable tbody');
   const exportBtn = document.getElementById('exportBtn');
 
-  // Set today's date as default
+  // Set today's date and current time as default
   const dateInput = document.getElementById('date');
-  dateInput.valueAsDate = new Date();
+  const timeInput = document.getElementById('time');
+  const now = new Date();
+  dateInput.valueAsDate = now;
+  timeInput.value = now.toTimeString().slice(0,5); // HH:MM
 
   // Load existing entries from localStorage
   let entries = JSON.parse(localStorage.getItem('foodEntries')) || [];
@@ -112,23 +128,19 @@
   form.addEventListener('submit', function(e) {
     e.preventDefault();
 
-    // Get current time in local timezone
-    const now = new Date();
-    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
     const entry = {
       date: document.getElementById('date').value,
-      time: timeString, // store local time
-      meal: document.getElementById('meal').value,
+      time: document.getElementById('time').value,
+      mood: document.getElementById('mood').value,
+      reason: document.getElementById('reason').value,
+      hunger: document.getElementById('hunger').value,
       calories: document.getElementById('calories').value,
       notes: document.getElementById('notes').value
     };
 
     if (editIndex === null) {
-      // Add new entry
       entries.push(entry);
     } else {
-      // Update existing entry
       entries[editIndex] = entry;
       editIndex = null;
     }
@@ -136,7 +148,8 @@
     localStorage.setItem('foodEntries', JSON.stringify(entries));
     renderTable();
     form.reset();
-    dateInput.valueAsDate = new Date(); // reset to today
+    dateInput.valueAsDate = new Date();
+    timeInput.value = new Date().toTimeString().slice(0,5);
   });
 
   function renderTable() {
@@ -144,8 +157,11 @@
     entries.forEach((entry, index) => {
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${entry.date} ${entry.time || ''}</td>
-        <td>${entry.meal}</td>
+        <td>${entry.date}</td>
+        <td>${entry.time}</td>
+        <td>${entry.mood}</td>
+        <td>${entry.reason}</td>
+        <td>${entry.hunger}</td>
         <td>${entry.calories}</td>
         <td>${entry.notes}</td>
         <td>
@@ -157,17 +173,18 @@
     });
   }
 
-  // Edit an entry
   function editEntry(index) {
     const entry = entries[index];
-    document.getElementById('date').value = entry.date;
-    document.getElementById('meal').value = entry.meal;
+    dateInput.value = entry.date;
+    timeInput.value = entry.time;
+    document.getElementById('mood').value = entry.mood;
+    document.getElementById('reason').value = entry.reason;
+    document.getElementById('hunger').value = entry.hunger;
     document.getElementById('calories').value = entry.calories;
     document.getElementById('notes').value = entry.notes;
-    editIndex = index; // mark which entry we’re editing
+    editIndex = index;
   }
 
-  // Delete an entry
   function deleteEntry(index) {
     if (confirm("Are you sure you want to delete this entry?")) {
       entries.splice(index, 1);
@@ -183,7 +200,6 @@
     XLSX.writeFile(workbook, 'food-diary.xlsx');
   });
 </script>
-
 
 </body>
 </html>
