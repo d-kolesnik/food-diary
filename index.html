@@ -73,9 +73,6 @@
       background: rgba(0,0,0,0.8);
       z-index: 1000;
     }
-    .img-modal.open {
-      display: flex;
-    }
     .img-modal-content {
       position: relative;
       max-width: 90vw;
@@ -118,8 +115,9 @@
     <label>Time:
       <input type="time" id="time" required />
     </label>
-    <fieldset style="border:1px solid #eee;padding:10px;border-radius:6px;">
-      <legend>Mood before eating (select all that apply)</legend>
+    <details>
+      <summary style="cursor:pointer;font-weight:600;margin-bottom:8px;">Mood before eating (select all that apply)</summary>
+      <fieldset style="border:1px solid #eee;padding:10px;border-radius:6px;">
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
         <div>
           <strong>🌧️ Negative / distress</strong>
@@ -146,11 +144,12 @@
           <div><label><input type="checkbox" name="mood" value="Proud"> Proud</label></div>
         </div>
       </div>
-      <div style="margin-top:8px;">
-        <label><input type="checkbox" id="moodOtherCheck" name="mood" value="Other"> Other:</label>
-        <input type="text" id="moodOtherText" placeholder="Enter other mood" style="width:auto;display:inline-block;margin-left:8px;" disabled />
+      <div style="margin-top:8px;display:flex;align-items:center;gap:6px;">
+        <label style="margin:0;">Other:</label>
+        <input type="text" id="moodOtherText" placeholder="Enter other mood" style="width:auto;display:inline-block;" />
       </div>
-    </fieldset>
+      </fieldset>
+    </details>
     <label>Reason to eat:
       <input type="text" id="reason" placeholder="e.g. Hunger, Boredom" />
     </label>
@@ -338,13 +337,7 @@
     const checked = Array.from(document.querySelectorAll('input[type=checkbox][name="mood"]:checked'))
       .map(cb => cb.value);
     const otherText = document.getElementById('moodOtherText').value.trim();
-    // If Other is checked and text is provided, include it
-    if (checked.includes('Other')) {
-      if (otherText) {
-        // replace 'Other' placeholder with provided text
-        return checked.map(v => v === 'Other' ? otherText : v);
-      }
-    }
+    if (otherText) checked.push(otherText);
     return checked;
   }
 
@@ -352,7 +345,6 @@
     // Clear all
     document.querySelectorAll('input[type=checkbox][name="mood"]').forEach(cb => cb.checked = false);
     document.getElementById('moodOtherText').value = '';
-    document.getElementById('moodOtherText').disabled = true;
 
     if (!moodValue) return;
     const moods = Array.isArray(moodValue) ? moodValue : [moodValue];
@@ -363,22 +355,13 @@
       if (match) {
         match.checked = true;
       } else {
-        // set Other and fill text
-        const otherCb = document.getElementById('moodOtherCheck');
-        otherCb.checked = true;
+        // fill other text
         const otherText = document.getElementById('moodOtherText');
-        otherText.disabled = false;
         otherText.value = m;
       }
     });
   }
 
-  // Enable/disable Other text input
-  document.getElementById('moodOtherCheck').addEventListener('change', function(e) {
-    const otherText = document.getElementById('moodOtherText');
-    otherText.disabled = !e.target.checked;
-    if (!e.target.checked) otherText.value = '';
-  });
 
   // ----- Modal functions -----
   function openImageModal(index) {
