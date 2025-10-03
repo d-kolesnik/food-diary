@@ -103,6 +103,11 @@
       border-radius: 4px;
       cursor: pointer;
     }
+    /* Mood layout tweaks */
+    .mood-summary { cursor:pointer; font-weight: normal; margin-bottom: 8px; }
+    .mood-cat { font-weight: normal; margin-bottom: 6px; }
+    .mood-item { display:flex; justify-content:space-between; align-items:center; padding:2px 0; }
+    .mood-item input { margin:0; }
   </style>
 </head>
 <body>
@@ -115,33 +120,33 @@
     <label>Time:
       <input type="time" id="time" required />
     </label>
-    <details>
-      <summary style="cursor:pointer;font-weight:600;margin-bottom:8px;">Mood before eating (select all that apply)</summary>
+    <details style="margin-top:14px;">
+      <summary class="mood-summary">Mood</summary>
       <fieldset style="border:1px solid #eee;padding:10px;border-radius:6px;">
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">
         <div>
-          <strong>🌧️ Negative / distress</strong>
-          <div><label><input type="checkbox" name="mood" value="Stressed"> Stressed</label></div>
-          <div><label><input type="checkbox" name="mood" value="Anxious / worried"> Anxious / worried</label></div>
-          <div><label><input type="checkbox" name="mood" value="Angry / frustrated"> Angry / frustrated</label></div>
-          <div><label><input type="checkbox" name="mood" value="Sad / down"> Sad / down</label></div>
-          <div><label><input type="checkbox" name="mood" value="Lonely"> Lonely</label></div>
-          <div><label><input type="checkbox" name="mood" value="Guilty / ashamed"> Guilty / ashamed</label></div>
-          <div><label><input type="checkbox" name="mood" value="Overwhelmed"> Overwhelmed</label></div>
+          <div class="mood-cat">🌧️ Negative / distress</div>
+          <div class="mood-item"><span>Stressed</span><input type="checkbox" name="mood" value="Stressed"></div>
+          <div class="mood-item"><span>Anxious / worried</span><input type="checkbox" name="mood" value="Anxious / worried"></div>
+          <div class="mood-item"><span>Angry / frustrated</span><input type="checkbox" name="mood" value="Angry / frustrated"></div>
+          <div class="mood-item"><span>Sad / down</span><input type="checkbox" name="mood" value="Sad / down"></div>
+          <div class="mood-item"><span>Lonely</span><input type="checkbox" name="mood" value="Lonely"></div>
+          <div class="mood-item"><span>Guilty / ashamed</span><input type="checkbox" name="mood" value="Guilty / ashamed"></div>
+          <div class="mood-item"><span>Overwhelmed</span><input type="checkbox" name="mood" value="Overwhelmed"></div>
         </div>
         <div>
-          <strong>😐 Neutral / low-energy</strong>
-          <div><label><input type="checkbox" name="mood" value="Tired / fatigued"> Tired / fatigued</label></div>
-          <div><label><input type="checkbox" name="mood" value="Bored"> Bored</label></div>
-          <div><label><input type="checkbox" name="mood" value="Numb / indifferent"> Numb / indifferent</label></div>
+          <div class="mood-cat">😐 Neutral / low-energy</div>
+          <div class="mood-item"><span>Tired / fatigued</span><input type="checkbox" name="mood" value="Tired / fatigued"></div>
+          <div class="mood-item"><span>Bored</span><input type="checkbox" name="mood" value="Bored"></div>
+          <div class="mood-item"><span>Numb / indifferent</span><input type="checkbox" name="mood" value="Numb / indifferent"></div>
         </div>
         <div>
-          <strong>🌞 Positive</strong>
-          <div><label><input type="checkbox" name="mood" value="Happy"> Happy</label></div>
-          <div><label><input type="checkbox" name="mood" value="Relaxed / calm"> Relaxed / calm</label></div>
-          <div><label><input type="checkbox" name="mood" value="Excited / enthusiastic"> Excited / enthusiastic</label></div>
-          <div><label><input type="checkbox" name="mood" value="Content / satisfied"> Content / satisfied</label></div>
-          <div><label><input type="checkbox" name="mood" value="Proud"> Proud</label></div>
+          <div class="mood-cat">🌞 Positive</div>
+          <div class="mood-item"><span>Happy</span><input type="checkbox" name="mood" value="Happy"></div>
+          <div class="mood-item"><span>Relaxed / calm</span><input type="checkbox" name="mood" value="Relaxed / calm"></div>
+          <div class="mood-item"><span>Excited / enthusiastic</span><input type="checkbox" name="mood" value="Excited / enthusiastic"></div>
+          <div class="mood-item"><span>Content / satisfied</span><input type="checkbox" name="mood" value="Content / satisfied"></div>
+          <div class="mood-item"><span>Proud</span><input type="checkbox" name="mood" value="Proud"></div>
         </div>
       </div>
       <div style="margin-top:8px;display:flex;align-items:center;gap:6px;">
