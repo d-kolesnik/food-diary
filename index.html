@@ -63,6 +63,49 @@
       max-height: 50px;
       display: block;
     }
+    /* Modal / lightbox styles */
+    .img-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+    }
+    .img-modal.open {
+      display: flex;
+    }
+    .img-modal-content {
+      position: relative;
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow: hidden;
+      background: transparent;
+      border-radius: 8px;
+    }
+    .img-modal img {
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+      transform-origin: center center;
+      cursor: grab;
+      will-change: transform;
+    }
+    .img-modal .controls {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 8px;
+    }
+    .img-modal .controls button {
+      padding: 6px 8px;
+      background: rgba(255,255,255,0.9);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -115,8 +158,21 @@
 
   <button class="btn-export" id="exportBtn">Export to Excel</button>
 
+  <!-- Image modal / lightbox -->
+  <div class="img-modal" id="imgModal" aria-hidden="true">
+    <div class="img-modal-content" id="imgModalContent">
+      <div class="controls">
+        <button id="zoomInBtn" title="Zoom in">+</button>
+        <button id="zoomOutBtn" title="Zoom out">−</button>
+        <button id="resetBtn" title="Reset">Reset</button>
+        <button id="closeBtn" title="Close">✕</button>
+      </div>
+      <img id="modalImage" src="" alt="Food photo" />
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
- <script>
+<script>
   const form = document.getElementById('foodForm');
   const tableBody = document.querySelector('#foodTable tbody');
   const exportBtn = document.getElementById('exportBtn');
@@ -124,12 +180,28 @@
   const timeInput = document.getElementById('time');
   const photoInput = document.getElementById('photo');
 
+  // Modal elements
+  const imgModal = document.getElementById('imgModal');
+  const modalImage = document.getElementById('modalImage');
+  const zoomInBtn = document.getElementById('zoomInBtn');
+  const zoomOutBtn = document.getElementById('zoomOutBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const closeBtn = document.getElementById('closeBtn');
+
   const now = new Date();
   dateInput.valueAsDate = now;
   timeInput.value = now.toTimeString().slice(0,5);
 
   let entries = JSON.parse(localStorage.getItem('foodEntries')) || [];
   let editIndex = null;
+
+  // State for modal image transform
+  let scale = 1;
+  let translateX = 0;
+  let translateY = 0;
+  let isPanning = false;
+  let startX = 0;
+  let startY = 0;
 
   renderTable();
 
@@ -188,7 +260,7 @@
         <td>${entry.hunger}</td>
         <td>${entry.calories}</td>
         <td>${entry.notes}</td>
-        <td>${entry.photo ? `<img src="${entry.photo}" class="photo-thumb" />` : ''}</td>
+        <td>${entry.photo ? `<img src="${entry.photo}" class="photo-thumb" data-index="${index}" onclick="openImageModal(${index})" />` : ''}</td>
         <td>
           <button onclick="editEntry(${index})">Edit</button>
           <button onclick="deleteEntry(${index})">Delete</button>
@@ -198,7 +270,8 @@
     });
   }
 
-  function editEntry(index) {
+  // Expose edit/delete to global scope (used by inline onclicks)
+  window.editEntry = function(index) {
     const entry = entries[index];
     dateInput.value = entry.date;
     timeInput.value = entry.time;
@@ -208,15 +281,15 @@
     document.getElementById('calories').value = entry.calories;
     document.getElementById('notes').value = entry.notes;
     editIndex = index;
-  }
+  };
 
-  function deleteEntry(index) {
+  window.deleteEntry = function(index) {
     if (confirm("Are you sure you want to delete this entry?")) {
       entries.splice(index, 1);
       localStorage.setItem('foodEntries', JSON.stringify(entries));
       renderTable();
     }
-  }
+  };
 
   exportBtn.addEventListener('click', function() {
     const exportEntries = entries.map(entry => {
@@ -229,6 +302,117 @@
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Food Diary');
     XLSX.writeFile(workbook, 'food-diary.xlsx');
   });
+
+  // ----- Modal functions -----
+  function openImageModal(index) {
+    const entry = entries[index];
+    if (!entry || !entry.photo) return;
+    modalImage.src = entry.photo;
+    resetTransform();
+    imgModal.classList.add('open');
+    imgModal.setAttribute('aria-hidden', 'false');
+    // Focus to capture keyboard events
+    document.addEventListener('keydown', onKeyDown);
+  }
+  window.openImageModal = openImageModal; // allow inline call
+
+  function closeImageModal() {
+    imgModal.classList.remove('open');
+    imgModal.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('keydown', onKeyDown);
+  }
+
+  function resetTransform() {
+    scale = 1;
+    translateX = 0;
+    translateY = 0;
+    applyTransform();
+  }
+
+  function applyTransform() {
+    modalImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  }
+
+  function changeScale(delta, centerX, centerY) {
+    const prevScale = scale;
+    scale = Math.max(0.5, Math.min(5, scale + delta));
+    // Adjust translate to zoom toward pointer
+    if (centerX != null && centerY != null) {
+      const rect = modalImage.getBoundingClientRect();
+      const dx = centerX - rect.left;
+      const dy = centerY - rect.top;
+      // compute new translation so that point under cursor stays roughly fixed
+      translateX -= (dx / prevScale) * (scale - prevScale);
+      translateY -= (dy / prevScale) * (scale - prevScale);
+    }
+    applyTransform();
+  }
+
+  // Mouse wheel to zoom
+  imgModal.addEventListener('wheel', function(e) {
+    if (!imgModal.classList.contains('open')) return;
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    changeScale(delta, e.clientX, e.clientY);
+  }, { passive: false });
+
+  // Buttons
+  zoomInBtn.addEventListener('click', () => changeScale(0.2));
+  zoomOutBtn.addEventListener('click', () => changeScale(-0.2));
+  resetBtn.addEventListener('click', resetTransform);
+  closeBtn.addEventListener('click', closeImageModal);
+
+  // Drag to pan
+  modalImage.addEventListener('mousedown', function(e) {
+    if (!imgModal.classList.contains('open')) return;
+    isPanning = true;
+    startX = e.clientX - translateX;
+    startY = e.clientY - translateY;
+    modalImage.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', function(e) {
+    if (!isPanning) return;
+    translateX = e.clientX - startX;
+    translateY = e.clientY - startY;
+    applyTransform();
+  });
+  window.addEventListener('mouseup', function() {
+    if (isPanning) {
+      isPanning = false;
+      modalImage.style.cursor = 'grab';
+    }
+  });
+
+  // Touch events for mobile
+  modalImage.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 1) {
+      const t = e.touches[0];
+      isPanning = true;
+      startX = t.clientX - translateX;
+      startY = t.clientY - translateY;
+    }
+  }, { passive: true });
+  modalImage.addEventListener('touchmove', function(e) {
+    if (!isPanning || e.touches.length !== 1) return;
+    const t = e.touches[0];
+    translateX = t.clientX - startX;
+    translateY = t.clientY - startY;
+    applyTransform();
+  }, { passive: true });
+  modalImage.addEventListener('touchend', function() { isPanning = false; });
+
+  // Close modal when clicking backdrop
+  imgModal.addEventListener('click', function(e) {
+    if (e.target === imgModal) closeImageModal();
+  });
+
+  function onKeyDown(e) {
+    if (e.key === 'Escape') closeImageModal();
+    if (e.key === '+') changeScale(0.2);
+    if (e.key === '-') changeScale(-0.2);
+    if (e.key === '0') resetTransform();
+  }
 </script>
 
 </body>
