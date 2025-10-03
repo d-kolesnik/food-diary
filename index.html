@@ -179,8 +179,11 @@
       </div>
       </fieldset>
     </details>
-    <label>Reason to eat:
-      <input type="text" id="reason" placeholder="e.g. Hunger, Boredom" />
+    <label>Where did I eat?
+      <input type="text" id="location" placeholder="e.g. home, work, restaurant, on the couch, in bed" />
+    </label>
+    <label>Who was I with?
+      <input type="text" id="company" placeholder="e.g. alone, with friends, with family" />
     </label>
     <label>Hunger level (1-10):
       <input type="number" id="hunger" min="1" max="10" />
@@ -203,7 +206,8 @@
         <th>Date</th>
         <th>Time</th>
         <th>Mood</th>
-        <th>Reason</th>
+  <th>Where</th>
+  <th>Who</th>
         <th>Hunger</th>
         <th>Calories</th>
         <th>Notes</th>
@@ -284,7 +288,8 @@
       date: dateInput.value,
       time: timeInput.value,
       mood: getSelectedMoods(),
-      reason: document.getElementById('reason').value,
+  location: document.getElementById('location').value,
+  company: document.getElementById('company').value,
       hunger: document.getElementById('hunger').value,
       calories: document.getElementById('calories').value,
       notes: document.getElementById('notes').value,
@@ -314,7 +319,8 @@
         <td>${entry.date}</td>
         <td>${entry.time}</td>
         <td>${Array.isArray(entry.mood) ? entry.mood.join(', ') : (entry.mood || '')}</td>
-        <td>${entry.reason}</td>
+  <td>${entry.location || ''}</td>
+  <td>${entry.company || ''}</td>
         <td>${entry.hunger}</td>
         <td>${entry.calories}</td>
         <td>${entry.notes}</td>
@@ -334,7 +340,8 @@
     dateInput.value = entry.date;
     timeInput.value = entry.time;
     populateMoodControls(entry.mood);
-    document.getElementById('reason').value = entry.reason;
+  document.getElementById('location').value = entry.location || '';
+  document.getElementById('company').value = entry.company || '';
     document.getElementById('hunger').value = entry.hunger;
     document.getElementById('calories').value = entry.calories;
     document.getElementById('notes').value = entry.notes;
