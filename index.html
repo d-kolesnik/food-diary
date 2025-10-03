@@ -185,37 +185,24 @@
     <label>Who was I with?
       <input type="text" id="company" placeholder="e.g. alone, with friends, with family" />
     </label>
-    <label>How hungry was I before eating? (1-10)
-      <input type="number" id="hungerBefore" min="1" max="10" />
+    <label>How hungry was I before eating?
+      <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="hungerBefore" min="1" max="10" value="5"><span id="hungerBeforeVal">5</span></div>
     </label>
-    <label>How mindful was I while eating? (1-10)
-      <input type="number" id="mindful" min="1" max="10" />
+    <label>How mindful was I while eating?
+      <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="mindful" min="1" max="10" value="5"><span id="mindfulVal">5</span></div>
     </label>
-    <label>How strong was the craving? (1-10)
-      <input type="number" id="craving" min="1" max="10" />
+    <label>How strong was the craving?
+      <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="craving" min="1" max="10" value="5"><span id="cravingVal">5</span></div>
     </label>
-    <label>How full did I feel after eating? (1-10)
-      <input type="number" id="fullAfter" min="1" max="10" />
+    <label>How full did I feel after eating?
+      <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="fullAfter" min="1" max="10" value="5"><span id="fullAfterVal">5</span></div>
     </label>
-    <fieldset style="border:1px solid #eee;padding:8px;border-radius:6px;margin-top:6px;">
-      <legend>How did I feel after eating? (select all that apply)</legend>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" name="afterFeeling" value="Guilty"> Guilty</label>
-        <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" name="afterFeeling" value="Satisfied"> Satisfied</label>
-        <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" name="afterFeeling" value="Regretful"> Regretful</label>
-        <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" name="afterFeeling" value="Content"> Content</label>
-      </div>
-    </fieldset>
-    <fieldset style="border:1px solid #eee;padding:8px;border-radius:6px;margin-top:6px;">
-      <legend>Do I have any physical symptoms?</legend>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" name="symptom" value="Bloating"> Bloating</label>
-        <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" name="symptom" value="Stomach pain"> Stomach pain</label>
-        <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" name="symptom" value="Nausea"> Nausea</label>
-        <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" name="symptom" value="Heartburn"> Heartburn</label>
-      </div>
-      <div style="margin-top:6px;display:flex;align-items:center;gap:6px;"><label style="margin:0;">Other symptoms:</label><input type="text" id="symptomOther" placeholder="Enter other symptoms" style="width:auto;display:inline-block;" /></div>
-    </fieldset>
+    <label>How did I feel after eating?
+      <input type="text" id="afterFeelingText" placeholder="e.g. guilty, satisfied, regretful, content" />
+    </label>
+    <label>Do I have any physical symptoms?
+      <input type="text" id="symptomsText" placeholder="e.g. bloating, stomach pain, nausea, heartburn" />
+    </label>
     <label>Calories:
       <input type="number" id="calories" placeholder="e.g. 500" />
     </label>
@@ -300,6 +287,15 @@
 
   renderTable();
 
+  // update displayed values for sliders
+  ['hungerBefore','mindful','craving','fullAfter'].forEach(id => {
+    const el = document.getElementById(id);
+    const valEl = document.getElementById(id + 'Val');
+    if (el && valEl) {
+      el.addEventListener('input', () => valEl.textContent = el.value);
+    }
+  });
+
   form.addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -327,9 +323,8 @@
   mindful: document.getElementById('mindful').value,
   craving: document.getElementById('craving').value,
   fullAfter: document.getElementById('fullAfter').value,
-  afterFeeling: Array.from(document.querySelectorAll('input[name="afterFeeling"]:checked')).map(cb => cb.value),
-  symptoms: Array.from(document.querySelectorAll('input[name="symptom"]:checked')).map(cb => cb.value),
-  symptomOther: document.getElementById('symptomOther').value,
+  afterFeeling: document.getElementById('afterFeelingText').value,
+  symptoms: document.getElementById('symptomsText').value,
       calories: document.getElementById('calories').value,
       notes: document.getElementById('notes').value,
       photo: photoData
@@ -364,8 +359,8 @@
   <td>${entry.mindful || ''}</td>
   <td>${entry.craving || ''}</td>
   <td>${entry.fullAfter || ''}</td>
-  <td>${Array.isArray(entry.afterFeeling) ? entry.afterFeeling.join(', ') : (entry.afterFeeling || '')}</td>
-  <td>${(Array.isArray(entry.symptoms) ? entry.symptoms.join(', ') : (entry.symptoms || ''))}${entry.symptomOther ? (entry.symptoms && entry.symptoms.length ? ', ' : '') + entry.symptomOther : ''}</td>
+  <td>${entry.afterFeeling || ''}</td>
+  <td>${entry.symptoms || ''}</td>
         <td>${entry.calories}</td>
         <td>${entry.notes}</td>
         <td>${entry.photo ? `<img src="${entry.photo}" class="photo-thumb" data-index="${index}" onclick="openImageModal(${index})" />` : ''}</td>
@@ -386,27 +381,17 @@
     populateMoodControls(entry.mood);
   document.getElementById('location').value = entry.location || '';
   document.getElementById('company').value = entry.company || '';
-    document.getElementById('hungerBefore').value = entry.hungerBefore || '';
-    document.getElementById('mindful').value = entry.mindful || '';
-    document.getElementById('craving').value = entry.craving || '';
-    document.getElementById('fullAfter').value = entry.fullAfter || '';
-    // after feeling
-    document.querySelectorAll('input[name="afterFeeling"]').forEach(cb => cb.checked = false);
-    if (entry.afterFeeling) {
-      (Array.isArray(entry.afterFeeling) ? entry.afterFeeling : [entry.afterFeeling]).forEach(v => {
-        const match = Array.from(document.querySelectorAll('input[name="afterFeeling"]')).find(cb => cb.value === v);
-        if (match) match.checked = true;
-      });
-    }
-    // symptoms
-    document.querySelectorAll('input[name="symptom"]').forEach(cb => cb.checked = false);
-    if (entry.symptoms) {
-      (Array.isArray(entry.symptoms) ? entry.symptoms : [entry.symptoms]).forEach(v => {
-        const match = Array.from(document.querySelectorAll('input[name="symptom"]')).find(cb => cb.value === v);
-        if (match) match.checked = true;
-      });
-    }
-    document.getElementById('symptomOther').value = entry.symptomOther || '';
+    document.getElementById('hungerBefore').value = entry.hungerBefore || 5;
+    document.getElementById('mindful').value = entry.mindful || 5;
+    document.getElementById('craving').value = entry.craving || 5;
+    document.getElementById('fullAfter').value = entry.fullAfter || 5;
+    document.getElementById('afterFeelingText').value = entry.afterFeeling || '';
+    document.getElementById('symptomsText').value = entry.symptoms || '';
+    // update slider labels
+    document.getElementById('hungerBeforeVal').textContent = document.getElementById('hungerBefore').value;
+    document.getElementById('mindfulVal').textContent = document.getElementById('mindful').value;
+    document.getElementById('cravingVal').textContent = document.getElementById('craving').value;
+    document.getElementById('fullAfterVal').textContent = document.getElementById('fullAfter').value;
     document.getElementById('calories').value = entry.calories;
     document.getElementById('notes').value = entry.notes;
     editIndex = index;
