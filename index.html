@@ -74,6 +74,10 @@
       background: rgba(0,0,0,0.8);
       z-index: 1000;
     }
+    /* show when opened */
+    .img-modal.open {
+      display: flex;
+    }
     .img-modal-content {
       position: relative;
       max-width: 90vw;
@@ -89,6 +93,9 @@
       transform-origin: center center;
       cursor: grab;
       will-change: transform;
+      /* ensure image fits inside modal content so scale/translate are visible */
+      max-width: 100%;
+      max-height: 100%;
     }
     .img-modal .controls {
       position: absolute;
@@ -460,6 +467,25 @@
     });
   }
 
+  // Delegated handlers: robust fallback if individual listeners fail for any reason
+  tableBody.addEventListener('click', function(e) {
+    const img = e.target.closest('.photo-thumb');
+    if (!img) return;
+    const idx = img.dataset.index;
+    if (idx == null) return;
+    openImageModal(Number(idx));
+  });
+  tableBody.addEventListener('keydown', function(e) {
+    const img = e.target.closest('.photo-thumb');
+    if (!img) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const idx = img.dataset.index;
+      if (idx == null) return;
+      openImageModal(Number(idx));
+    }
+  });
+
   // Expose edit/delete to global scope (used by inline onclicks)
   window.editEntry = function(index) {
     const entry = entries[index];
@@ -539,10 +565,12 @@
   function openImageModal(index) {
     const entry = entries[index];
     if (!entry || !entry.photo) return;
+    console.debug('openImageModal called for index', index);
     modalImage.src = entry.photo;
     resetTransform();
     imgModal.classList.add('open');
     imgModal.setAttribute('aria-hidden', 'false');
+    modalImage.style.cursor = 'grab';
     // Focus to capture keyboard events
     document.addEventListener('keydown', onKeyDown);
   }
@@ -566,6 +594,7 @@
   }
 
   function changeScale(delta, centerX, centerY) {
+    console.debug('changeScale', { delta, scaleBefore: scale, centerX, centerY });
     const prevScale = scale;
     scale = Math.max(0.5, Math.min(5, scale + delta));
     // Adjust translate to zoom toward pointer
@@ -577,20 +606,26 @@
       translateX -= (dx / prevScale) * (scale - prevScale);
       translateY -= (dy / prevScale) * (scale - prevScale);
     }
-    applyTransform();
+    // only apply transform if modalImage is in the DOM and has naturalWidth (loaded)
+    if (modalImage && modalImage.complete && modalImage.naturalWidth) {
+      applyTransform();
+    } else {
+      console.warn('applyTransform skipped: image not loaded/available');
+    }
   }
 
   // Mouse wheel to zoom
   imgModal.addEventListener('wheel', function(e) {
     if (!imgModal.classList.contains('open')) return;
+    console.debug('imgModal wheel event', { deltaY: e.deltaY });
     e.preventDefault();
     const delta = e.deltaY > 0 ? -0.1 : 0.1;
     changeScale(delta, e.clientX, e.clientY);
   }, { passive: false });
 
   // Buttons
-  zoomInBtn.addEventListener('click', () => changeScale(0.2));
-  zoomOutBtn.addEventListener('click', () => changeScale(-0.2));
+  if (zoomInBtn) zoomInBtn.addEventListener('click', () => changeScale(0.2)); else console.warn('zoomInBtn missing');
+  if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => changeScale(-0.2)); else console.warn('zoomOutBtn missing');
   resetBtn.addEventListener('click', resetTransform);
   closeBtn.addEventListener('click', closeImageModal);
 
