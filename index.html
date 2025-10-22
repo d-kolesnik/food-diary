@@ -220,6 +220,9 @@
     <label>Photo:
       <input type="file" id="photo" accept="image/*" />
     </label>
+    <div id="photoPreviewContainer" style="margin-top:8px;">
+      <img id="photoPreview" src="" alt="Photo preview" style="max-width:120px;max-height:120px;display:none;border:1px solid #ddd;padding:4px;border-radius:4px;" />
+    </div>
     <button type="submit">Save Entry</button>
   </form>
 
@@ -284,6 +287,8 @@
 
   let entries = JSON.parse(localStorage.getItem('foodEntries')) || [];
   let editIndex = null;
+  // photo being edited/previewed (data URL)
+  let editingPhoto = null;
 
   // State for modal image transform
   let scale = 1;
@@ -304,6 +309,26 @@
     }
   });
 
+  // Photo input preview and editing state
+  const photoPreview = document.getElementById('photoPreview');
+  photoInput.addEventListener('change', function() {
+    const f = photoInput.files[0];
+    if (!f) {
+      // user cleared file input; keep existing editingPhoto until save/clear
+      return;
+    }
+    processImageFile(f).then(dataUrl => {
+      editingPhoto = dataUrl;
+      if (photoPreview) {
+        photoPreview.src = dataUrl;
+        photoPreview.style.display = 'inline-block';
+      }
+    }).catch(err => {
+      console.error('Preview processing failed', err);
+      alert('Could not process selected photo for preview.');
+    });
+  });
+
   form.addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -320,7 +345,8 @@
         saveEntry(null);
       });
     } else {
-      saveEntry(null); // no photo, save immediately
+      // if editing an existing entry and no new file selected, keep the existing photo
+      saveEntry(editingPhoto || null);
     }
   });
 
@@ -429,6 +455,10 @@
     form.reset();
     dateInput.valueAsDate = new Date();
     timeInput.value = new Date().toTimeString().slice(0,5);
+    // clear editing state and preview
+    editingPhoto = null;
+    const photoPreview = document.getElementById('photoPreview');
+    if (photoPreview) { photoPreview.src = ''; photoPreview.style.display = 'none'; }
   }
 
   function renderTable() {
@@ -508,6 +538,17 @@
     document.getElementById('calories').value = entry.calories;
     document.getElementById('notes').value = entry.notes;
     editIndex = index;
+    // set editing photo preview (preserve existing photo until replaced)
+    editingPhoto = entry.photo || null;
+    if (editingPhoto && photoPreview) {
+      photoPreview.src = editingPhoto;
+      photoPreview.style.display = 'inline-block';
+    } else if (photoPreview) {
+      photoPreview.src = '';
+      photoPreview.style.display = 'none';
+    }
+    // clear any selected file in the input so we don't accidentally read a stale FileList
+    if (photoInput) photoInput.value = '';
   };
 
   window.deleteEntry = function(index) {
