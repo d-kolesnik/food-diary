@@ -208,7 +208,7 @@
       <input type="number" id="calories" placeholder="e.g. 500" />
     </label>
     <label>Notes:
-      <textarea id="notes" placeholder="e.g. eggs, toast, coffee"></textarea>
+      <textarea id="notes" placeholder="e.g. someone brought a birthday cake to the office"></textarea>
     </label>
     <label>Photo:
       <input type="file" id="photo" accept="image/*" />
@@ -303,15 +303,64 @@
     const file = photoInput.files[0];
 
     if (file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        saveEntry(event.target.result); // call after file is loaded
-      };
-      reader.readAsDataURL(file);
+      // process image (resize/compress) to avoid localStorage quota issues on mobile
+      processImageFile(file).then(dataUrl => {
+        saveEntry(dataUrl);
+      }).catch(err => {
+        console.error('Image processing failed', err);
+        alert('Could not process the photo. Try a smaller image or use a desktop to attach it.');
+        // still try to save without photo
+        saveEntry(null);
+      });
     } else {
       saveEntry(null); // no photo, save immediately
     }
   });
+
+  // Read an image file and resize/compress it. Returns a Promise resolving to a data URL.
+  function processImageFile(file, maxWidth = 1024, maxSizeBytes = 1024*700) {
+    return new Promise((resolve, reject) => {
+      try {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            // compute new size keeping aspect ratio
+            let iw = img.width;
+            let ih = img.height;
+            let scale = Math.min(1, maxWidth / Math.max(iw, ih));
+            let sw = Math.round(iw * scale);
+            let sh = Math.round(ih * scale);
+            const canvas = document.createElement('canvas');
+            canvas.width = sw;
+            canvas.height = sh;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, sw, sh);
+            // try gradually reducing quality until size below threshold
+            let quality = 0.9;
+            function tryExport() {
+              const dataUrl = canvas.toDataURL('image/jpeg', quality);
+              // estimate size from base64 length
+              const size = Math.round((dataUrl.length - 'data:image/jpeg;base64,'.length) * 3/4);
+              if (size <= maxSizeBytes || quality <= 0.4) {
+                resolve(dataUrl);
+              } else {
+                quality -= 0.15;
+                tryExport();
+              }
+            }
+            tryExport();
+          };
+          img.onerror = () => reject(new Error('Invalid image'));
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
 
   function saveEntry(photoData) {
     const entry = {
@@ -338,8 +387,37 @@
       editIndex = null;
     }
 
-    localStorage.setItem('foodEntries', JSON.stringify(entries));
-    renderTable();
+    try {
+      localStorage.setItem('foodEntries', JSON.stringify(entries));
+      renderTable();
+    } catch (err) {
+      console.warn('localStorage setItem failed, possibly quota exceeded', err);
+      // try fallback: remove photo and save
+      if (entry.photo) {
+        if (confirm('Saving the photo failed (likely too large). Save the entry without the photo?')) {
+          entry.photo = null;
+          if (editIndex === null) {
+            entries[entries.length-1] = entry; // replace last pushed
+          } else {
+            entries[editIndex] = entry;
+          }
+          try {
+            localStorage.setItem('foodEntries', JSON.stringify(entries));
+            renderTable();
+            return;
+          } catch (err2) {
+            console.error('Fallback save failed', err2);
+            alert('Saving failed. Please clear some space in your browser or use smaller photos.');
+            return;
+          }
+        } else {
+          alert('Entry not saved. Try a smaller photo or save without a photo.');
+          return;
+        }
+      } else {
+        alert('Saving failed. Please clear some space in your browser.');
+      }
+    }
 
     form.reset();
     dateInput.valueAsDate = new Date();
@@ -364,13 +442,21 @@
   <td>${entry.symptoms || ''}</td>
         <td>${entry.calories}</td>
         <td>${entry.notes}</td>
-        <td>${entry.photo ? `<img src="${entry.photo}" class="photo-thumb" data-index="${index}" onclick="openImageModal(${index})" />` : ''}</td>
+        <td>${entry.photo ? `<img src="${entry.photo}" class="photo-thumb" data-index="${index}" />` : ''}</td>
         <td>
           <button onclick="editEntry(${index})">Edit</button>
           <button onclick="deleteEntry(${index})">Delete</button>
         </td>
       `;
       tableBody.appendChild(row);
+      // attach click/keyboard handlers to thumbnail (use JS listeners to avoid issues with inline handlers)
+      const imgEl = row.querySelector('.photo-thumb');
+      if (imgEl) {
+        imgEl.style.pointerEvents = 'auto';
+        imgEl.tabIndex = 0;
+        imgEl.addEventListener('click', function() { openImageModal(index); });
+        imgEl.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openImageModal(index); } });
+      }
     });
   }
 
