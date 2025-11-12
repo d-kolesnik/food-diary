@@ -123,6 +123,11 @@
 </head>
 <body>
   <h1>🍎 My Food Diary</h1>
+  <div id="editBanner" style="display:none;background:#fff4e5;border:1px solid #ffd27a;padding:10px;border-radius:6px;margin-bottom:12px;">
+    <strong>Editing entry</strong>
+    <span id="editBannerMsg" style="margin-left:8px;color:#555;">You're editing an existing entry — make changes and click Save or Cancel.</span>
+    <button id="cancelEditBtn" style="float:right;background:#fff;border:1px solid #ccc;padding:6px 8px;border-radius:4px;cursor:pointer;">Cancel</button>
+  </div>
 
   <form id="foodForm">
     <label>Date:
@@ -354,6 +359,28 @@
   // initialize visibility on load
   updateLocationOtherVisibility();
 
+  // Edit banner elements and handlers
+  const editBanner = document.getElementById('editBanner');
+  const cancelEditBtn = document.getElementById('cancelEditBtn');
+  function showEditBanner() {
+    if (editBanner) editBanner.style.display = 'block';
+    // scroll to top so banner is visible
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0,0); }
+  }
+  function hideEditBanner() {
+    if (editBanner) editBanner.style.display = 'none';
+  }
+  if (cancelEditBtn) cancelEditBtn.addEventListener('click', function() {
+    // cancel editing
+    editIndex = null;
+    editingPhoto = null;
+    if (photoPreview) { photoPreview.src = ''; photoPreview.style.display = 'none'; }
+    form.reset();
+    dateInput.valueAsDate = new Date();
+    timeInput.value = new Date().toTimeString().slice(0,5);
+    hideEditBanner();
+  });
+
   form.addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -502,6 +529,8 @@
     document.querySelectorAll('input[name="locationChoice"]').forEach(r => r.checked = false);
     const locationOtherEl = document.getElementById('locationOther');
     if (locationOtherEl) { locationOtherEl.value = ''; locationOtherEl.style.display = 'none'; }
+    // hide edit banner if present
+    try { hideEditBanner(); } catch (e) {}
   }
 
   function renderTable() {
@@ -607,6 +636,8 @@
     }
     // clear any selected file in the input so we don't accidentally read a stale FileList
     if (photoInput) photoInput.value = '';
+    // show edit banner and scroll to top
+    try { showEditBanner(); } catch (e) {}
   };
 
   window.deleteEntry = function(index) {
