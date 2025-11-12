@@ -187,9 +187,16 @@
       </div>
       </fieldset>
     </details>
-    <label>Where did I eat?
-      <input type="text" id="location" placeholder="e.g. home, work, restaurant, on the couch, in bed" />
-    </label>
+    <fieldset style="margin-top:8px;border:1px solid #eee;padding:8px;border-radius:6px;">
+      <legend style="padding:0 6px;">Where did I eat?</legend>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="Home"> Home</label>
+        <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="Work"> Work</label>
+        <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="Restaurant"> Restaurant</label>
+        <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="Other"> Other</label>
+        <input type="text" id="locationOther" placeholder="Enter other location" style="width:auto;display:none;margin-left:6px;" />
+      </div>
+    </fieldset>
     <label>Who was I with?
       <input type="text" id="company" placeholder="e.g. alone, with friends, with family" />
     </label>
