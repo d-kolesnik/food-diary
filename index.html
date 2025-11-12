@@ -336,6 +336,24 @@
     });
   });
 
+  // Location radio handlers: show/hide Other input
+  const locationOther = document.getElementById('locationOther');
+  function updateLocationOtherVisibility() {
+    const sel = document.querySelector('input[name="locationChoice"]:checked');
+    if (sel && sel.value === 'Other') {
+      if (locationOther) {
+        locationOther.style.display = 'inline-block';
+        // focus the field so the user can type immediately
+        setTimeout(() => { try { locationOther.focus(); } catch (e) {} }, 0);
+      }
+    } else {
+      if (locationOther) { locationOther.style.display = 'none'; locationOther.value = ''; }
+    }
+  }
+  document.querySelectorAll('input[name="locationChoice"]').forEach(r => r.addEventListener('change', updateLocationOtherVisibility));
+  // initialize visibility on load
+  updateLocationOtherVisibility();
+
   form.addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -393,23 +411,6 @@
             tryExport();
           };
           img.onerror = () => reject(new Error('Invalid image'));
-          // Location radio handlers: show/hide Other input
-          const locationOther = document.getElementById('locationOther');
-          function updateLocationOtherVisibility() {
-            const sel = document.querySelector('input[name="locationChoice"]:checked');
-            if (sel && sel.value === 'Other') {
-              if (locationOther) {
-                locationOther.style.display = 'inline-block';
-                // focus the field so the user can type immediately
-                setTimeout(() => { try { locationOther.focus(); } catch (e) {} }, 0);
-              }
-            } else {
-              if (locationOther) { locationOther.style.display = 'none'; locationOther.value = ''; }
-            }
-          }
-          document.querySelectorAll('input[name="locationChoice"]').forEach(r => r.addEventListener('change', updateLocationOtherVisibility));
-          // initialize visibility on load
-          updateLocationOtherVisibility();
           img.src = e.target.result;
         };
         reader.readAsDataURL(file);
