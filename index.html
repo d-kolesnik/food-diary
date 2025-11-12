@@ -194,7 +194,7 @@
         <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="Work"> Work</label>
         <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="Restaurant"> Restaurant</label>
         <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="Other"> Other</label>
-        <input type="text" id="locationOther" placeholder="Enter other location" style="width:auto;display:none;margin-left:6px;" />
+        <input type="text" id="locationOther" placeholder="Enter other location" style="min-width:200px;display:none;margin-left:6px;" />
       </div>
     </fieldset>
     <label>Who was I with?
@@ -393,6 +393,23 @@
             tryExport();
           };
           img.onerror = () => reject(new Error('Invalid image'));
+          // Location radio handlers: show/hide Other input
+          const locationOther = document.getElementById('locationOther');
+          function updateLocationOtherVisibility() {
+            const sel = document.querySelector('input[name="locationChoice"]:checked');
+            if (sel && sel.value === 'Other') {
+              if (locationOther) {
+                locationOther.style.display = 'inline-block';
+                // focus the field so the user can type immediately
+                setTimeout(() => { try { locationOther.focus(); } catch (e) {} }, 0);
+              }
+            } else {
+              if (locationOther) { locationOther.style.display = 'none'; locationOther.value = ''; }
+            }
+          }
+          document.querySelectorAll('input[name="locationChoice"]').forEach(r => r.addEventListener('change', updateLocationOtherVisibility));
+          // initialize visibility on load
+          updateLocationOtherVisibility();
           img.src = e.target.result;
         };
         reader.readAsDataURL(file);
@@ -403,18 +420,32 @@
   }
 
   function saveEntry(photoData) {
+    // determine location value from radios / other text
+    let locationVal = '';
+    const locSel = document.querySelector('input[name="locationChoice"]:checked');
+    if (locSel) {
+      if (locSel.value === 'Other') {
+        locationVal = (document.getElementById('locationOther') || { value: '' }).value.trim();
+      } else {
+        locationVal = locSel.value;
+      }
+    } else {
+      // fallback: empty or previous manual value
+      locationVal = (document.getElementById('locationOther') || { value: '' }).value.trim();
+    }
+
     const entry = {
       date: dateInput.value,
       time: timeInput.value,
       mood: getSelectedMoods(),
-  location: document.getElementById('location').value,
-  company: document.getElementById('company').value,
-  hungerBefore: document.getElementById('hungerBefore').value,
-  mindful: document.getElementById('mindful').value,
-  craving: document.getElementById('craving').value,
-  fullAfter: document.getElementById('fullAfter').value,
-  afterFeeling: document.getElementById('afterFeelingText').value,
-  symptoms: document.getElementById('symptomsText').value,
+      location: locationVal,
+      company: document.getElementById('company').value,
+      hungerBefore: document.getElementById('hungerBefore').value,
+      mindful: document.getElementById('mindful').value,
+      craving: document.getElementById('craving').value,
+      fullAfter: document.getElementById('fullAfter').value,
+      afterFeeling: document.getElementById('afterFeelingText').value,
+      symptoms: document.getElementById('symptomsText').value,
       calories: document.getElementById('calories').value,
       notes: document.getElementById('notes').value,
       photo: photoData
@@ -466,6 +497,10 @@
     editingPhoto = null;
     const photoPreview = document.getElementById('photoPreview');
     if (photoPreview) { photoPreview.src = ''; photoPreview.style.display = 'none'; }
+    // clear location radios and other field
+    document.querySelectorAll('input[name="locationChoice"]').forEach(r => r.checked = false);
+    const locationOtherEl = document.getElementById('locationOther');
+    if (locationOtherEl) { locationOtherEl.value = ''; locationOtherEl.style.display = 'none'; }
   }
 
   function renderTable() {
@@ -529,7 +564,22 @@
     dateInput.value = entry.date;
     timeInput.value = entry.time;
     populateMoodControls(entry.mood);
-  document.getElementById('location').value = entry.location || '';
+  // populate location radios / Other
+  const loc = entry.location || '';
+  if (loc) {
+    const match = Array.from(document.querySelectorAll('input[name="locationChoice"]')).find(r => r.value === loc);
+    if (match) {
+      match.checked = true;
+      if (locationOther) locationOther.style.display = 'none';
+    } else {
+      const otherRadio = document.querySelector('input[name="locationChoice"][value="Other"]');
+      if (otherRadio) otherRadio.checked = true;
+      if (locationOther) { locationOther.style.display = 'inline-block'; locationOther.value = loc; }
+    }
+  } else {
+    document.querySelectorAll('input[name="locationChoice"]').forEach(r => r.checked = false);
+    if (locationOther) { locationOther.value = ''; locationOther.style.display = 'none'; }
+  }
   document.getElementById('company').value = entry.company || '';
     document.getElementById('hungerBefore').value = entry.hungerBefore || 5;
     document.getElementById('mindful').value = entry.mindful || 5;
