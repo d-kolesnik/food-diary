@@ -136,7 +136,7 @@
     <label>Time:
       <input type="time" id="time" required />
     </label>
-    <details style="margin-top:14px;">
+    <details style="margin-top:14px;" open>
       <summary class="mood-summary">Mood</summary>
       <fieldset style="border:1px solid #eee;padding:10px;border-radius:6px;">
       <div style="display:flex;gap:24px;flex-wrap:wrap;">
@@ -157,6 +157,10 @@
             <div class="mood-checkbox"><input type="checkbox" name="mood" value="Guilty / ashamed"></div>
             <div class="mood-label">Overwhelmed</div>
             <div class="mood-checkbox"><input type="checkbox" name="mood" value="Overwhelmed"></div>
+            <div class="mood-label">Irritated</div>
+            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Irritated"></div>
+            <div class="mood-label">Stress about work</div>
+            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Stress about work"></div>
           </div>
         </div>
         <div>
@@ -183,6 +187,8 @@
             <div class="mood-checkbox"><input type="checkbox" name="mood" value="Content / satisfied"></div>
             <div class="mood-label">Proud</div>
             <div class="mood-checkbox"><input type="checkbox" name="mood" value="Proud"></div>
+            <div class="mood-label">Focused</div>
+            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Focused"></div>
           </div>
         </div>
       </div>
@@ -206,16 +212,16 @@
       <input type="text" id="company" placeholder="e.g. alone, with friends, with family" />
     </label>
     <label>How hungry was I before eating?
-      <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="hungerBefore" min="1" max="10" value="5"><span id="hungerBeforeVal">5</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="hungerBefore" min="0" max="10" value="5"><span id="hungerBeforeVal">5</span></div>
     </label>
     <label>How mindful was I while eating?
-      <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="mindful" min="1" max="10" value="5"><span id="mindfulVal">5</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="mindful" min="0" max="10" value="5"><span id="mindfulVal">5</span></div>
     </label>
     <label>How strong was the craving?
-      <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="craving" min="1" max="10" value="5"><span id="cravingVal">5</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="craving" min="0" max="10" value="5"><span id="cravingVal">5</span></div>
     </label>
     <label>How full did I feel after eating?
-      <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="fullAfter" min="1" max="10" value="5"><span id="fullAfterVal">5</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="fullAfter" min="0" max="10" value="5"><span id="fullAfterVal">5</span></div>
     </label>
     <label>How did I feel after eating?
       <input type="text" id="afterFeelingText" placeholder="e.g. guilty, satisfied, regretful, content" />
@@ -381,6 +387,27 @@
     hideEditBanner();
   });
 
+  // --- create per-mood sliders that appear when the checkbox is checked ---
+  function sanitizeForId(s) { return String(s).replace(/[^a-z0-9]+/gi, '_'); }
+  document.querySelectorAll('input[type="checkbox"][name="mood"]').forEach(cb => {
+    const moodName = cb.value;
+    const id = 'moodRange_' + sanitizeForId(moodName);
+    const valId = 'moodRangeVal_' + sanitizeForId(moodName);
+    if (document.getElementById(id)) return;
+    const range = document.createElement('input');
+    range.type = 'range'; range.min = 0; range.max = 10; range.value = 5; range.id = id;
+    range.style.display = 'none'; range.style.width = '110px'; range.style.marginLeft = '8px';
+    const valSpan = document.createElement('span'); valSpan.id = valId; valSpan.textContent = range.value;
+    valSpan.style.display = 'none'; valSpan.style.marginLeft = '6px';
+    cb.parentNode.appendChild(range);
+    cb.parentNode.appendChild(valSpan);
+    cb.addEventListener('change', () => {
+      if (cb.checked) { range.style.display = 'inline-block'; valSpan.style.display = 'inline-block'; setTimeout(()=>{ try{ range.focus(); }catch(e){} },0); }
+      else { range.style.display = 'none'; valSpan.style.display = 'none'; }
+    });
+    range.addEventListener('input', () => { valSpan.textContent = range.value; });
+  });
+
   form.addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -447,6 +474,20 @@
     });
   }
 
+  // collect mood intensities for checked moods (returns object { moodName: value })
+  function getMoodIntensities() {
+    const out = {};
+    document.querySelectorAll('input[type="checkbox"][name="mood"]').forEach(cb => {
+      if (cb.checked) {
+        const id = 'moodRange_' + String(cb.value).replace(/[^a-z0-9]+/gi, '_');
+        const r = document.getElementById(id);
+        if (r) out[cb.value] = Number(r.value);
+        else out[cb.value] = 5;
+      }
+    });
+    return out;
+  }
+
   function saveEntry(photoData) {
     // determine location value from radios / other text
     let locationVal = '';
@@ -466,6 +507,7 @@
       date: dateInput.value,
       time: timeInput.value,
       mood: getSelectedMoods(),
+      moodIntensities: getMoodIntensities(),
       location: locationVal,
       company: document.getElementById('company').value,
       hungerBefore: document.getElementById('hungerBefore').value,
@@ -529,6 +571,10 @@
     document.querySelectorAll('input[name="locationChoice"]').forEach(r => r.checked = false);
     const locationOtherEl = document.getElementById('locationOther');
     if (locationOtherEl) { locationOtherEl.value = ''; locationOtherEl.style.display = 'none'; }
+    // hide any displayed mood ranges and clear other mood text
+    document.querySelectorAll('[id^="moodRange_"]').forEach(r => { r.style.display = 'none'; });
+    document.querySelectorAll('[id^="moodRangeVal_"]').forEach(s => { s.style.display = 'none'; });
+    const moodOther = document.getElementById('moodOtherText'); if (moodOther) moodOther.value = '';
     // hide edit banner if present
     try { hideEditBanner(); } catch (e) {}
   }
@@ -537,10 +583,19 @@
     tableBody.innerHTML = '';
     entries.forEach((entry, index) => {
       const row = document.createElement('tr');
+      // prepare mood display: include intensities if available
+      let moodDisplay = '';
+      if (entry && entry.moodIntensities && Object.keys(entry.moodIntensities).length) {
+        moodDisplay = Object.entries(entry.moodIntensities).map(([k,v]) => `${k} (${v})`).join(', ');
+      } else if (Array.isArray(entry.mood)) {
+        moodDisplay = entry.mood.join(', ');
+      } else {
+        moodDisplay = entry.mood || '';
+      }
       row.innerHTML = `
         <td>${entry.date}</td>
         <td>${entry.time}</td>
-        <td>${Array.isArray(entry.mood) ? entry.mood.join(', ') : (entry.mood || '')}</td>
+        <td>${moodDisplay}</td>
   <td>${entry.location || ''}</td>
   <td>${entry.company || ''}</td>
   <td>${entry.hungerBefore || ''}</td>
@@ -593,7 +648,7 @@
     const entry = entries[index];
     dateInput.value = entry.date;
     timeInput.value = entry.time;
-    populateMoodControls(entry.mood);
+    populateMoodControls(entry.mood, entry.moodIntensities || {});
   // populate location radios / Other
   const loc = entry.location || '';
   if (loc) {
@@ -669,10 +724,14 @@
     return checked;
   }
 
-  function populateMoodControls(moodValue) {
+  function populateMoodControls(moodValue, moodInts = {}) {
     // Clear all
     document.querySelectorAll('input[type=checkbox][name="mood"]').forEach(cb => cb.checked = false);
     document.getElementById('moodOtherText').value = '';
+
+    // hide all mood ranges initially
+    document.querySelectorAll('[id^="moodRange_"]').forEach(r => { r.style.display = 'none'; });
+    document.querySelectorAll('[id^="moodRangeVal_"]').forEach(s => { s.style.display = 'none'; });
 
     if (!moodValue) return;
     const moods = Array.isArray(moodValue) ? moodValue : [moodValue];
@@ -682,6 +741,16 @@
         .find(cb => cb.value === m);
       if (match) {
         match.checked = true;
+        // show and set the corresponding range if present
+        const rid = 'moodRange_' + String(m).replace(/[^a-z0-9]+/gi, '_');
+        const vid = 'moodRangeVal_' + String(m).replace(/[^a-z0-9]+/gi, '_');
+        const r = document.getElementById(rid);
+        const v = document.getElementById(vid);
+        if (r) {
+          r.style.display = 'inline-block';
+          if (moodInts && moodInts[m] != null) r.value = moodInts[m];
+        }
+        if (v) { v.style.display = 'inline-block'; v.textContent = (moodInts && moodInts[m] != null) ? moodInts[m] : (r ? r.value : '5'); }
       } else {
         // fill other text
         const otherText = document.getElementById('moodOtherText');
