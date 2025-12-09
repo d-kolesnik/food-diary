@@ -8,10 +8,18 @@
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
-      background: #f9f9f9;
+      /* Cosmic / space background */
+      background: radial-gradient(ellipse at bottom, #0b1930 0%, #020617 50%),
+                  radial-gradient(circle at 20% 20%, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.0) 2px),
+                  radial-gradient(circle at 80% 80%, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.0) 2px);
+      background-blend-mode: normal, screen, screen;
+      color: #f3f6fb;
+      min-height: 100vh;
     }
     h1 {
       text-align: center;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
     }
     form {
       margin-bottom: 20px;
@@ -159,7 +167,7 @@
             <div class="mood-checkbox"><input type="checkbox" name="mood" value="Overwhelmed"></div>
             <div class="mood-label">Irritated</div>
             <div class="mood-checkbox"><input type="checkbox" name="mood" value="Irritated"></div>
-            <div class="mood-label">Stress about work</div>
+            <div class="mood-label">Stressed about work</div>
             <div class="mood-checkbox"><input type="checkbox" name="mood" value="Stress about work"></div>
           </div>
         </div>
@@ -202,7 +210,8 @@
       <legend style="padding:0 6px;">Where did I eat?</legend>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
         <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="Home"> Home</label>
-        <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="Work"> Work</label>
+        <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="At the desk"> At the desk</label>
+        <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="Work in the kitchen"> Work in the kitchen</label>
         <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="Restaurant"> Restaurant</label>
         <label style="display:inline-flex;align-items:center;gap:6px;width:auto;"><input type="radio" name="locationChoice" value="Other"> Other</label>
         <input type="text" id="locationOther" placeholder="Enter other location" style="min-width:200px;display:none;margin-left:6px;" />
@@ -244,28 +253,9 @@
     <button type="submit">Save Entry</button>
   </form>
 
-  <table id="foodTable">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Mood</th>
-  <th>Where</th>
-  <th>Who</th>
-  <th>Hunger before</th>
-  <th>Mindful</th>
-  <th>Craving</th>
-  <th>Full after</th>
-  <th>After feeling</th>
-  <th>Symptoms</th>
-        <th>Calories</th>
-        <th>Notes</th>
-        <th>Photo</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div id="foodTable" class="food-groups">
+    <!-- JS will render entries grouped by date here as <details> sections -->
+  </div>
 
   <button class="btn-export" id="exportBtn">Export to Excel</button>
 
@@ -285,7 +275,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
   const form = document.getElementById('foodForm');
-  const tableBody = document.querySelector('#foodTable tbody');
+  const groupsContainer = document.getElementById('foodTable');
   const exportBtn = document.getElementById('exportBtn');
   const dateInput = document.getElementById('date');
   const timeInput = document.getElementById('time');
@@ -580,59 +570,118 @@
   }
 
   function renderTable() {
-    tableBody.innerHTML = '';
-    entries.forEach((entry, index) => {
-      const row = document.createElement('tr');
-      // prepare mood display: include intensities if available
-      let moodDisplay = '';
-      if (entry && entry.moodIntensities && Object.keys(entry.moodIntensities).length) {
-        moodDisplay = Object.entries(entry.moodIntensities).map(([k,v]) => `${k} (${v})`).join(', ');
-      } else if (Array.isArray(entry.mood)) {
-        moodDisplay = entry.mood.join(', ');
-      } else {
-        moodDisplay = entry.mood || '';
-      }
-      row.innerHTML = `
-        <td>${entry.date}</td>
-        <td>${entry.time}</td>
-        <td>${moodDisplay}</td>
-  <td>${entry.location || ''}</td>
-  <td>${entry.company || ''}</td>
-  <td>${entry.hungerBefore || ''}</td>
-  <td>${entry.mindful || ''}</td>
-  <td>${entry.craving || ''}</td>
-  <td>${entry.fullAfter || ''}</td>
-  <td>${entry.afterFeeling || ''}</td>
-  <td>${entry.symptoms || ''}</td>
-        <td>${entry.calories}</td>
-        <td>${entry.notes}</td>
-        <td>${entry.photo ? `<img src="${entry.photo}" class="photo-thumb" data-index="${index}" />` : ''}</td>
-        <td>
-          <button onclick="editEntry(${index})">Edit</button>
-          <button onclick="deleteEntry(${index})">Delete</button>
-        </td>
-      `;
-      tableBody.appendChild(row);
-      // attach click/keyboard handlers to thumbnail (use JS listeners to avoid issues with inline handlers)
-      const imgEl = row.querySelector('.photo-thumb');
-      if (imgEl) {
-        imgEl.style.pointerEvents = 'auto';
-        imgEl.tabIndex = 0;
-        imgEl.addEventListener('click', function() { openImageModal(index); });
-        imgEl.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openImageModal(index); } });
-      }
+    // Render entries grouped by date into the groupsContainer using <details> sections.
+    groupsContainer.innerHTML = '';
+    if (!entries || entries.length === 0) {
+      groupsContainer.innerHTML = '<p style="color:#666">No entries yet.</p>';
+      return;
+    }
+
+    // Group entries by date
+    const groups = {};
+    entries.forEach((entry, idx) => {
+      const d = entry.date || 'No date';
+      if (!groups[d]) groups[d] = [];
+      groups[d].push({ entry, idx });
+    });
+
+    // Sort dates descending (newest first)
+    const dates = Object.keys(groups).sort((a,b) => b.localeCompare(a));
+
+    dates.forEach(date => {
+      const items = groups[date];
+      const details = document.createElement('details');
+      details.style.marginBottom = '10px';
+      const summary = document.createElement('summary');
+      summary.textContent = `${date} (${items.length} entries)`;
+      details.appendChild(summary);
+
+      const table = document.createElement('table');
+      table.style.marginTop = '8px';
+      const thead = document.createElement('thead');
+      thead.innerHTML = `<tr>
+        <th>Time</th>
+        <th>Mood</th>
+        <th>Location</th>
+        <th>Company</th>
+        <th>Hunger</th>
+        <th>Mindful</th>
+        <th>Craving</th>
+        <th>Full</th>
+        <th>After</th>
+        <th>Symptoms</th>
+        <th>Calories</th>
+        <th>Notes</th>
+        <th>Photo</th>
+        <th>Actions</th>
+      </tr>`;
+      table.appendChild(thead);
+      const tbody = document.createElement('tbody');
+
+      items.forEach(({ entry, idx }) => {
+        const tr = document.createElement('tr');
+        let moodDisplay = '';
+        if (entry && entry.moodIntensities && Object.keys(entry.moodIntensities).length) {
+          moodDisplay = Object.entries(entry.moodIntensities).map(([k,v]) => `${k} (${v})`).join(', ');
+        } else if (Array.isArray(entry.mood)) {
+          moodDisplay = entry.mood.join(', ');
+        } else {
+          moodDisplay = entry.mood || '';
+        }
+        tr.innerHTML = `
+          <td>${entry.time || ''}</td>
+          <td>${moodDisplay}</td>
+          <td>${entry.location || ''}</td>
+          <td>${entry.company || ''}</td>
+          <td>${entry.hungerBefore || ''}</td>
+          <td>${entry.mindful || ''}</td>
+          <td>${entry.craving || ''}</td>
+          <td>${entry.fullAfter || ''}</td>
+          <td>${entry.afterFeeling || ''}</td>
+          <td>${entry.symptoms || ''}</td>
+          <td>${entry.calories || ''}</td>
+          <td>${entry.notes || ''}</td>
+          <td>${entry.photo ? `<img src="${entry.photo}" class="photo-thumb" data-index="${idx}" />` : ''}</td>
+          <td><button data-action="edit" data-index="${idx}">Edit</button> <button data-action="delete" data-index="${idx}">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      details.appendChild(table);
+      groupsContainer.appendChild(details);
+    });
+
+    // Delegate edit/delete via buttons (use event delegation for robustness)
+    groupsContainer.querySelectorAll('button[data-action="edit"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.dataset.index);
+        if (!Number.isNaN(idx)) window.editEntry(idx);
+      });
+    });
+    groupsContainer.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.dataset.index);
+        if (!Number.isNaN(idx)) window.deleteEntry(idx);
+      });
+    });
+
+    // Ensure thumbnails are keyboard-focusable and rely on the delegated handlers
+    groupsContainer.querySelectorAll('.photo-thumb').forEach(img => {
+      img.style.pointerEvents = 'auto';
+      img.tabIndex = 0;
     });
   }
 
   // Delegated handlers: robust fallback if individual listeners fail for any reason
-  tableBody.addEventListener('click', function(e) {
+  groupsContainer.addEventListener('click', function(e) {
     const img = e.target.closest('.photo-thumb');
     if (!img) return;
     const idx = img.dataset.index;
     if (idx == null) return;
     openImageModal(Number(idx));
   });
-  tableBody.addEventListener('keydown', function(e) {
+  groupsContainer.addEventListener('keydown', function(e) {
     const img = e.target.closest('.photo-thumb');
     if (!img) return;
     if (e.key === 'Enter' || e.key === ' ') {
