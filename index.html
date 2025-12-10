@@ -8,18 +8,13 @@
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
-      /* Cosmic / space background */
-      background: radial-gradient(ellipse at bottom, #0b1930 0%, #020617 50%),
-                  radial-gradient(circle at 20% 20%, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.0) 2px),
-                  radial-gradient(circle at 80% 80%, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.0) 2px);
-      background-blend-mode: normal, screen, screen;
-      color: #f3f6fb;
+      background: #700070;
+      color: #000;
       min-height: 100vh;
     }
     h1 {
       text-align: center;
-      color: #fff;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+      color: #000;
     }
     form {
       margin-bottom: 20px;
@@ -130,7 +125,7 @@
   </style>
 </head>
 <body>
-  <h1>🍎 My Food Diary</h1>
+  <h1>⭐ My Food Diary</h1>
   <div id="editBanner" style="display:none;background:#fff4e5;border:1px solid #ffd27a;padding:10px;border-radius:6px;margin-bottom:12px;">
     <strong>Editing entry</strong>
     <span id="editBannerMsg" style="margin-left:8px;color:#555;">You're editing an existing entry — make changes and click Save or Cancel.</span>
@@ -758,7 +753,17 @@
       if (e.photo) e.photo = '[Image]';
       return e;
     });
-    const worksheet = XLSX.utils.json_to_sheet(exportEntries);
+    // Convert to vertical format: each entry becomes columns
+    const verticalData = [];
+    const fieldNames = exportEntries.length > 0 ? Object.keys(exportEntries[0]) : [];
+    fieldNames.forEach(field => {
+      const row = { Field: field };
+      exportEntries.forEach((entry, idx) => {
+        row[`Entry ${idx + 1}`] = entry[field];
+      });
+      verticalData.push(row);
+    });
+    const worksheet = XLSX.utils.json_to_sheet(verticalData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Food Diary');
     XLSX.writeFile(workbook, 'food-diary.xlsx');
