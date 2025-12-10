@@ -14,7 +14,7 @@
     }
     h1 {
       text-align: center;
-      color: #000;
+      color: #fff;
     }
     form {
       margin-bottom: 20px;
@@ -116,6 +116,7 @@
     }
     /* Mood layout tweaks */
     .mood-summary { cursor:pointer; font-weight: normal; margin-bottom: 8px; }
+    summary { color: #fff; }
     .mood-cat { font-weight: normal; margin-bottom: 6px; }
   .mood-grid { display:grid; grid-template-columns: 1fr auto; row-gap:4px; column-gap:12px; }
   .mood-item { display: contents; }
@@ -586,35 +587,19 @@
     dates.forEach(date => {
       const items = groups[date];
       const details = document.createElement('details');
-      details.style.marginBottom = '10px';
+      details.style.marginBottom = '15px';
       const summary = document.createElement('summary');
       summary.textContent = `${date} (${items.length} entries)`;
+      summary.style.cursor = 'pointer';
       details.appendChild(summary);
 
-      const table = document.createElement('table');
-      table.style.marginTop = '8px';
-      const thead = document.createElement('thead');
-      thead.innerHTML = `<tr>
-        <th>Time</th>
-        <th>Mood</th>
-        <th>Location</th>
-        <th>Company</th>
-        <th>Hunger</th>
-        <th>Mindful</th>
-        <th>Craving</th>
-        <th>Full</th>
-        <th>After</th>
-        <th>Symptoms</th>
-        <th>Calories</th>
-        <th>Notes</th>
-        <th>Photo</th>
-        <th>Actions</th>
-      </tr>`;
-      table.appendChild(thead);
-      const tbody = document.createElement('tbody');
+      const container = document.createElement('div');
+      container.style.marginTop = '10px';
 
       items.forEach(({ entry, idx }) => {
-        const tr = document.createElement('tr');
+        const card = document.createElement('div');
+        card.style.cssText = 'background:#fff; border:1px solid #ddd; border-radius:6px; padding:12px; margin-bottom:10px; box-shadow:0 2px 4px rgba(0,0,0,0.1);';
+        
         let moodDisplay = '';
         if (entry && entry.moodIntensities && Object.keys(entry.moodIntensities).length) {
           moodDisplay = Object.entries(entry.moodIntensities).map(([k,v]) => `${k} (${v})`).join(', ');
@@ -623,27 +608,40 @@
         } else {
           moodDisplay = entry.mood || '';
         }
-        tr.innerHTML = `
-          <td>${entry.time || ''}</td>
-          <td>${moodDisplay}</td>
-          <td>${entry.location || ''}</td>
-          <td>${entry.company || ''}</td>
-          <td>${entry.hungerBefore || ''}</td>
-          <td>${entry.mindful || ''}</td>
-          <td>${entry.craving || ''}</td>
-          <td>${entry.fullAfter || ''}</td>
-          <td>${entry.afterFeeling || ''}</td>
-          <td>${entry.symptoms || ''}</td>
-          <td>${entry.calories || ''}</td>
-          <td>${entry.notes || ''}</td>
-          <td>${entry.photo ? `<img src="${entry.photo}" class="photo-thumb" data-index="${idx}" />` : ''}</td>
-          <td><button data-action="edit" data-index="${idx}">Edit</button> <button data-action="delete" data-index="${idx}">Delete</button></td>
-        `;
-        tbody.appendChild(tr);
+
+        const fields = [
+          { label: 'Time', value: entry.time || '' },
+          { label: 'Mood', value: moodDisplay },
+          { label: 'Location', value: entry.location || '' },
+          { label: 'Company', value: entry.company || '' },
+          { label: 'Hunger Before', value: entry.hungerBefore || '' },
+          { label: 'Mindful', value: entry.mindful || '' },
+          { label: 'Craving', value: entry.craving || '' },
+          { label: 'Full After', value: entry.fullAfter || '' },
+          { label: 'After Feeling', value: entry.afterFeeling || '' },
+          { label: 'Symptoms', value: entry.symptoms || '' },
+          { label: 'Calories', value: entry.calories || '' },
+          { label: 'Notes', value: entry.notes || '' }
+        ];
+
+        let cardHTML = '';
+        fields.forEach(field => {
+          if (field.value) {
+            cardHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>${field.label}:</strong> <span>${field.value}</span></div>`;
+          }
+        });
+
+        if (entry.photo) {
+          cardHTML += `<div style="margin-top:8px;"><img src="${entry.photo}" class="photo-thumb" data-index="${idx}" style="margin-top:4px;" /></div>`;
+        }
+
+        cardHTML += `<div style="margin-top:8px; display:flex; gap:6px;"><button data-action="edit" data-index="${idx}">Edit</button> <button data-action="delete" data-index="${idx}">Delete</button></div>`;
+
+        card.innerHTML = cardHTML;
+        container.appendChild(card);
       });
 
-      table.appendChild(tbody);
-      details.appendChild(table);
+      details.appendChild(container);
       groupsContainer.appendChild(details);
     });
 
@@ -753,17 +751,7 @@
       if (e.photo) e.photo = '[Image]';
       return e;
     });
-    // Convert to vertical format: each entry becomes columns
-    const verticalData = [];
-    const fieldNames = exportEntries.length > 0 ? Object.keys(exportEntries[0]) : [];
-    fieldNames.forEach(field => {
-      const row = { Field: field };
-      exportEntries.forEach((entry, idx) => {
-        row[`Entry ${idx + 1}`] = entry[field];
-      });
-      verticalData.push(row);
-    });
-    const worksheet = XLSX.utils.json_to_sheet(verticalData);
+    const worksheet = XLSX.utils.json_to_sheet(exportEntries);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Food Diary');
     XLSX.writeFile(workbook, 'food-diary.xlsx');
