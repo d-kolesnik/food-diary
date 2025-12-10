@@ -666,10 +666,9 @@
           { label: 'Notes', value: entry.notes || '' }
         ];
 
-        // card header with icons and timestamp
+        // card header with icon (time moved to the 'Time' field)
         let cardHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
             <div style="font-weight:600;">🍽️ Meal</div>
-            <div style="color:#666;font-size:0.95em;">⏰ ${entry.time || ''}</div>
           </div>`;
         fields.forEach(field => {
           if (field.value) {
