@@ -65,6 +65,44 @@
     .btn-export:hover {
       background: #45a049;
     }
+    /* new button accents */
+    .btn-add {
+      background: linear-gradient(180deg,#6fcf97,#2ea44f);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn-add:hover { filter: brightness(0.95); }
+    .btn-delete {
+      background: linear-gradient(180deg,#ff9b9b,#e85b5b);
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn-delete:hover { filter: brightness(0.95); }
+    .btn-edit {
+      background: linear-gradient(180deg,#e6f0ff,#bcdcff);
+      color: #03204a;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn-edit:hover { filter: brightness(0.98); }
+
+    /* Accessible focus outlines for all accent buttons */
+    .btn-add:focus, .btn-delete:focus, .btn-edit:focus, .btn-export:focus {
+      outline: 3px solid rgba(34,139,230,0.25);
+      outline-offset: 2px;
+    }
+
+    /* stronger heading weight */
+    h1 { font-weight: 700; }
+    summary { font-weight: 600; }
     img.photo-thumb {
       max-width: 50px;
       max-height: 50px;
@@ -250,14 +288,14 @@
     <div id="photoPreviewContainer" style="margin-top:8px;">
       <img id="photoPreview" src="" alt="Photo preview" style="max-width:120px;max-height:120px;display:none;border:1px solid #ddd;padding:4px;border-radius:4px;" />
     </div>
-    <button type="submit">Save Entry</button>
+    <button type="submit" class="btn-add" aria-label="Add entry">🍽️ Add Entry</button>
   </form>
 
   <div id="foodTable" class="food-groups">
     <!-- JS will render entries grouped by date here as <details> sections -->
   </div>
 
-  <button class="btn-export" id="exportBtn">Export to Excel</button>
+  <button class="btn-export" id="exportBtn">📊 Export to Excel</button>
 
   <!-- Image modal / lightbox -->
   <div class="img-modal" id="imgModal" aria-hidden="true">
@@ -628,7 +666,11 @@
           { label: 'Notes', value: entry.notes || '' }
         ];
 
-        let cardHTML = '';
+        // card header with icons and timestamp
+        let cardHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="font-weight:600;">🍽️ Meal</div>
+            <div style="color:#666;font-size:0.95em;">⏰ ${entry.time || ''}</div>
+          </div>`;
         fields.forEach(field => {
           if (field.value) {
             cardHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>${field.label}:</strong> <span>${field.value}</span></div>`;
@@ -639,7 +681,7 @@
           cardHTML += `<div style="margin-top:8px;"><img src="${entry.photo}" class="photo-thumb" data-index="${idx}" style="margin-top:4px;" /></div>`;
         }
 
-        cardHTML += `<div style="margin-top:8px; display:flex; gap:6px;"><button data-action="edit" data-index="${idx}">Edit</button> <button data-action="delete" data-index="${idx}">Delete</button></div>`;
+        cardHTML += `<div style="margin-top:8px; display:flex; gap:6px;"><button class="btn-edit" data-action="edit" data-index="${idx}">Edit</button> <button class="btn-delete" data-action="delete" data-index="${idx}">Delete</button></div>`;
 
         card.innerHTML = cardHTML;
         container.appendChild(card);
