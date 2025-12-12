@@ -100,6 +100,55 @@
       outline-offset: 2px;
     }
 
+    /* Slider styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: linear-gradient(to right, #ddd 0%, #ddd 100%);
+      border-radius: 3px;
+      outline: none;
+      position: relative;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #4CAF50;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      background: #4CAF50;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+    }
+    /* Add tick marks */
+    input[type="range"] {
+      background: repeating-linear-gradient(to right, #ddd 0, #ddd 1px, transparent 1px, transparent calc(100% / 10));
+    }
+    /* Add numbers at ends */
+    input[type="range"]::before {
+      content: "0";
+      position: absolute;
+      left: -10px;
+      top: 10px;
+      font-size: 12px;
+      color: #000;
+    }
+    input[type="range"]::after {
+      content: "10";
+      position: absolute;
+      right: -15px;
+      top: 10px;
+      font-size: 12px;
+      color: #000;
+    }
+
     /* stronger heading weight */
     h1 { font-weight: 700; }
     summary { font-weight: 600; }
@@ -255,33 +304,24 @@
         <input type="text" id="locationOther" placeholder="Enter other location" style="min-width:200px;display:none;margin-left:6px;" />
       </div>
     </fieldset>
-    <label>Who was I with?
+    <label>Who was I with?</label>
       <input type="text" id="company" placeholder="e.g. alone, with friends, with family" />
-    </label>
-    <label>How hungry was I before eating?
-      <div style="display:flex;flex-direction:column;gap:4px;"><input type="range" id="hungerBefore" min="0" max="10" value="5" style="max-width:150px;"><span id="hungerBeforeVal">5</span></div>
-    </label>
-    <label>How mindful was I while eating?
-      <div style="display:flex;flex-direction:column;gap:4px;"><input type="range" id="mindful" min="0" max="10" value="5" style="max-width:150px;"><span id="mindfulVal">5</span></div>
-    </label>
-    <label>How strong was the craving?
-      <div style="display:flex;flex-direction:column;gap:4px;"><input type="range" id="craving" min="0" max="10" value="5" style="max-width:150px;"><span id="cravingVal">5</span></div>
-    </label>
-    <label>How full did I feel after eating?
-      <div style="display:flex;flex-direction:column;gap:4px;"><input type="range" id="fullAfter" min="0" max="10" value="5" style="max-width:150px;"><span id="fullAfterVal">5</span></div>
-    </label>
-    <label>How did I feel after eating?
+    <label>How hungry was I before eating?</label>
+      <div style="display:flex;flex-direction:column;gap:4px;"><span id="hungerBeforeVal" style="align-self:flex-start;">5</span><input type="range" id="hungerBefore" min="0" max="10" value="5" style="max-width:225px;"></div>
+    <label>How mindful was I while eating?</label>
+      <div style="display:flex;flex-direction:column;gap:4px;"><span id="mindfulVal" style="align-self:flex-start;">5</span><input type="range" id="mindful" min="0" max="10" value="5" style="max-width:225px;"></div>
+    <label>How strong was the craving?</label>
+      <div style="display:flex;flex-direction:column;gap:4px;"><span id="cravingVal" style="align-self:flex-start;">5</span><input type="range" id="craving" min="0" max="10" value="5" style="max-width:225px;"></div>
+    <label>How full did I feel after eating?</label>
+      <div style="display:flex;flex-direction:column;gap:4px;"><span id="fullAfterVal" style="align-self:flex-start;">5</span><input type="range" id="fullAfter" min="0" max="10" value="5" style="max-width:225px;"></div>
+    <label>How did I feel after eating?</label>
       <input type="text" id="afterFeelingText" placeholder="e.g. guilty, satisfied, regretful, content" />
-    </label>
-    <label>Do I have any physical symptoms?
+    <label>Do I have any physical symptoms?</label>
       <input type="text" id="symptomsText" placeholder="e.g. bloating, stomach pain, nausea, heartburn" />
-    </label>
-    <label>Calories:
+    <label>Calories:</label>
       <input type="number" id="calories" placeholder="e.g. 500" />
-    </label>
-    <label>Notes:
+    <label>Notes:</label>
       <textarea id="notes" placeholder="e.g. someone brought a birthday cake to the office"></textarea>
-    </label>
     <label>Photo:
       <input type="file" id="photo" accept="image/*" />
     </label>
