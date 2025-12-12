@@ -294,35 +294,96 @@
       </fieldset>
     </details>
 
-<fieldset style="margin-top:8px;border:1px solid #eee;padding:8px;border-radius:6px;text-align:left;">
-  <legend style="padding:0 6px;">Where did I eat?</legend>
 
-  <div style="display:flex;flex-direction:column;gap:8px;text-align:left;">
-    <label style="display:flex;align-items:flex-start;gap:8px;">
-      <input type="radio" name="locationChoice" value="Home"> Home
+<fieldset class="where-ate" dir="ltr">
+  <legend>Where did I eat?</legend>
+
+  <div class="options">
+    <label class="option">
+      <input type="radio" name="locationChoice" value="Home">
+      <span class="text">Home</span>
     </label>
 
-    <label style="display:flex;align-items:flex-start;gap:8px;">
-      <input type="radio" name="locationChoice" value="At the desk"> At the desk
+    <label class="option">
+      <input type="radio" name="locationChoice" value="At the desk">
+      <span class="text">At the desk</span>
     </label>
 
-    <label style="display:flex;align-items:flex-start;gap:8px;">
-      <input type="radio" name="locationChoice" value="In the kitchen at work"> In the kitchen at work
+    <label class="option">
+      <input type="radio" name="locationChoice" value="In the kitchen at work">
+      <span class="text">In the kitchen at work</span>
     </label>
 
-    <label style="display:flex;align-items:flex-start;gap:8px;">
-      <input type="radio" name="locationChoice" value="Restaurant"> Restaurant
+    <label class="option">
+      <input type="radio" name="locationChoice" value="Restaurant">
+      <span class="text">Restaurant</span>
     </label>
 
-    <label style="display:flex;align-items:flex-start;gap:8px;">
-      <input type="radio" name="locationChoice" value="Other"> Other
+    <label class="option">
+      <input type="radio" name="locationChoice" value="Other">
+      <span class="text">Other</span>
     </label>
 
-    <input type="text" id="locationOther"
-           placeholder="Enter other location"
-           style="min-width:200px;display:none;margin-left:6px;" />
+    <!-- Row that shows the "Other" input aligned with the text column -->
+    <div class="other-row" hidden>
+      <span class="spacer" aria-hidden="true"></span>
+      <input type="text" id="locationOther" placeholder="Enter other location">
+    </div>
   </div>
 </fieldset>
+
+<style>
+  /* Base container */
+  .where-ate{
+    margin-top:8px;
+    border:1px solid #eee;
+    padding:8px;
+    border-radius:6px;
+    text-align:left;       /* ensure left alignment in LTR */
+  }
+
+  /* Stack rows neatly */
+  .options{
+    display:grid;
+    grid-auto-rows:auto;
+    row-gap:8px;
+  }
+
+  /* Each option: radio column + text column */
+  .option{
+    display:grid;
+    grid-template-columns: 1.25rem auto; /* fixed column for radio, flexible for text */
+    column-gap:8px;
+    align-items:start;                    /* radio aligns with first line of text */
+    text-align:left;                      /* defend against global right-align */
+    direction:ltr;                        /* defend against global RTL */
+  }
+
+  /* Normalize radio positioning */
+  .option input[type="radio"]{
+    place-self:start;     /* top-left of the grid cell */
+    margin:0;             /* remove browser default margins */
+    /* optional nudge if your browser centers the radio vertically:
+       margin-top:0.15em; */
+  }
+
+  .option .text{
+    line-height:1.3;      /* nicer wrapping on long labels */
+    word-break:normal;    /* avoid forced word-by-word breaking */
+  }
+
+  /* "Other" row uses the same 2-column layout: spacer + input */
+  .other-row{
+    display:grid;
+    grid-template-columns: 1.25rem auto;
+    column-gap:8px;
+    align-items:start;
+  }
+
+  .other-row .spacer{ width:1.25rem; }
+  #locationOther{ min-width:200px; }
+</style>
+
 
 <script>
   // Show the "Other" text box only when "Other" is selected
