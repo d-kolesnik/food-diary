@@ -293,16 +293,47 @@
       </div>
       </fieldset>
     </details>
-    <fieldset style="margin-top:8px;border:1px solid #eee;padding:8px;border-radius:6px;text-align:left;">
-      <legend style="padding:0 6px;">Where did I eat?</legend>
-      <div style="display:flex;flex-direction:column;gap:6px;text-align:left;">
-        <label style="display:flex;align-items:center;justify-content:flex-start;gap:6px;width:fit-content;"><input type="radio" name="locationChoice" value="Home"> Home</label>
-        <label style="display:flex;align-items:center;justify-content:flex-start;gap:6px;width:fit-content;"><input type="radio" name="locationChoice" value="At the desk"> At the desk</label>
-        <label style="display:flex;align-items:center;justify-content:flex-start;gap:6px;width:fit-content;"><input type="radio" name="locationChoice" value="In the kitchen at work"> In the kitchen at work</label>
-        <label style="display:flex;align-items:center;justify-content:flex-start;gap:6px;width:fit-content;"><input type="radio" name="locationChoice" value="Restaurant"> Restaurant</label>
-        <label style="display:flex;align-items:center;justify-content:flex-start;gap:6px;width:fit-content;"><input type="radio" name="locationChoice" value="Other"> Other</label>
-        <input type="text" id="locationOther" placeholder="Enter other location" style="min-width:200px;display:none;margin-left:6px;" />
-      </div>
+
+<fieldset style="margin-top:8px;border:1px solid #eee;padding:8px;border-radius:6px;text-align:left;">
+  <legend style="padding:0 6px;">Where did I eat?</legend>
+
+  <div style="display:flex;flex-direction:column;gap:8px;text-align:left;">
+    <label style="display:flex;align-items:flex-start;gap:8px;">
+      <input type="radio" name="locationChoice" value="Home"> Home
+    </label>
+
+    <label style="display:flex;align-items:flex-start;gap:8px;">
+      <input type="radio" name="locationChoice" value="At the desk"> At the desk
+    </label>
+
+    <label style="display:flex;align-items:flex-start;gap:8px;">
+      <input type="radio" name="locationChoice" value="In the kitchen at work"> In the kitchen at work
+    </label>
+
+    <label style="display:flex;align-items:flex-start;gap:8px;">
+      <input type="radio" name="locationChoice" value="Restaurant"> Restaurant
+    </label>
+
+    <label style="display:flex;align-items:flex-start;gap:8px;">
+      <input type="radio" name="locationChoice" value="Other"> Other
+    </label>
+
+    <input type="text" id="locationOther"
+           placeholder="Enter other location"
+           style="min-width:200px;display:none;margin-left:6px;" />
+  </div>
+</fieldset>
+
+<script>
+  // Show the "Other" text box only when "Other" is selected
+  const otherInput = document.getElementById('locationOther');
+  document.querySelectorAll('input[name="locationChoice"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      otherInput.style.display = e.target.value === 'Other' ? 'inline-block' : 'none';
+    });
+  });
+</script>
+
     </fieldset>
     <label>Who was I with?</label>
       <input type="text" id="company" placeholder="e.g. alone, with friends, with family" />
