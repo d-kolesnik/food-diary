@@ -520,7 +520,9 @@
   let db = null;
   let auth = null;
   try {
-    const app = firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps || firebase.apps.length === 0) {
+      const app = firebase.initializeApp(firebaseConfig);
+    }
     db = firebase.firestore();
     auth = firebase.auth();
     firebase.analytics();
