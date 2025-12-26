@@ -4,21 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Food Diary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Poppins', Arial, sans-serif;
       margin: 20px;
-      background: #700070;
-      color: #000;
+      background: #1E1B29;
+      color: #FFFFFF;
       min-height: 100vh;
     }
     h1 {
       text-align: center;
-      color: #fff;
+      font-size: 36px;
+      background: linear-gradient(90deg, #E040FB, #9C27B0, #673AB7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px rgba(224, 64, 251, 0.5);
+      font-weight: 700;
     }
     form {
       margin-bottom: 20px;
-      background: #fff;
+      background: #673AB7;
       padding: 15px;
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -31,9 +37,11 @@
       width: 100%;
       padding: 8px;
       margin-top: 5px;
-      border: 1px solid #ccc;
+      border: 1px solid #B39DDB;
       border-radius: 5px;
       box-sizing: border-box;
+      background: #2D2A3D;
+      color: #FFFFFF;
     }
     input[type="date"], input[type="time"], input[type="text"], input[type="number"] {
       max-width: 300px;
@@ -41,33 +49,33 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      background: #fff;
+      background: #673AB7;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     th, td {
       padding: 10px;
-      border: 1px solid #ddd;
+      border: 1px solid #B39DDB;
       text-align: left;
       vertical-align: middle;
     }
     th {
-      background: #eee;
+      background: #9C27B0;
     }
     .btn-export {
       margin-top: 20px;
       padding: 10px;
-      background: #4CAF50;
+      background: #9C27B0;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
     .btn-export:hover {
-      background: #45a049;
+      background: #7B1FA2;
     }
     /* new button accents */
     .btn-add {
-      background: linear-gradient(180deg,#6fcf97,#2ea44f);
+      background: linear-gradient(180deg, #9C27B0, #7B1FA2);
       color: white;
       border: none;
       padding: 8px 12px;
@@ -76,7 +84,7 @@
     }
     .btn-add:hover { filter: brightness(0.95); }
     .btn-delete {
-      background: linear-gradient(180deg,#ff9b9b,#e85b5b);
+      background: linear-gradient(180deg, #F44336, #D32F2F);
       color: white;
       border: none;
       padding: 6px 10px;
@@ -85,8 +93,8 @@
     }
     .btn-delete:hover { filter: brightness(0.95); }
     .btn-edit {
-      background: linear-gradient(180deg,#e6f0ff,#bcdcff);
-      color: #03204a;
+      background: linear-gradient(180deg, #673AB7, #512DA8);
+      color: #FFFFFF;
       border: none;
       padding: 6px 10px;
       border-radius: 6px;
@@ -116,23 +124,23 @@
       appearance: none;
       width: 20px;
       height: 20px;
-      background: linear-gradient(135deg, #4CAF50, #388E3C);
+      background: linear-gradient(135deg, #9C27B0, #7B1FA2);
       border: 2px solid #fff;
       border-radius: 50%;
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
     input[type="range"]::-webkit-slider-thumb:hover {
-      background: linear-gradient(135deg, #45a049, #2e7d32);
+      background: linear-gradient(135deg, #7B1FA2, #6A1B9A);
     }
     input[type="range"]::-webkit-slider-thumb:focus {
-      outline: 2px solid #4CAF50;
+      outline: 2px solid #E040FB;
       outline-offset: 2px;
     }
     input[type="range"]::-moz-range-thumb {
       width: 20px;
       height: 20px;
-      background: linear-gradient(135deg, #4CAF50, #388E3C);
+      background: linear-gradient(135deg, #9C27B0, #7B1FA2);
       border: 2px solid #fff;
       border-radius: 50%;
       cursor: pointer;
@@ -140,7 +148,7 @@
       border: none;
     }
     input[type="range"]::-moz-range-thumb:hover {
-      background: linear-gradient(135deg, #45a049, #2e7d32);
+      background: linear-gradient(135deg, #7B1FA2, #6A1B9A);
     }
     input[type="range"]::-moz-range-thumb:focus {
       outline: 2px solid #4CAF50;
@@ -221,9 +229,9 @@
       cursor: pointer;
     }
     /* Mood layout tweaks */
-    .mood-summary { cursor:pointer; font-weight: normal; margin-bottom: 8px; color: #000; }
-    summary { color: #fff; }
-    .mood-cat { font-weight: normal; margin-bottom: 6px; }
+    .mood-summary { cursor:pointer; font-weight: normal; margin-bottom: 8px; color: #B39DDB; }
+    summary { color: #B39DDB; }
+    .mood-cat { font-weight: normal; margin-bottom: 6px; color: #FFFFFF; }
   .mood-grid { display: flex; flex-direction: column; gap: 4px; }
   .mood-item { display: flex; align-items: center; gap: 12px; }
   .mood-checkbox { }
@@ -233,10 +241,10 @@
 </head>
 <body>
   <h1>⭐ My Food Diary ⭐</h1>
-  <div id="editBanner" style="display:none;background:#fff4e5;border:1px solid #ffd27a;padding:10px;border-radius:6px;margin-bottom:12px;">
+  <div id="editBanner" style="display:none;background:#673AB7;border:1px solid #B39DDB;padding:10px;border-radius:6px;margin-bottom:12px;color:#FFFFFF;">
     <strong>Editing entry</strong>
-    <span id="editBannerMsg" style="margin-left:8px;color:#555;">You're editing an existing entry — make changes and click Save or Cancel.</span>
-    <button id="cancelEditBtn" style="float:right;background:#fff;border:1px solid #ccc;padding:6px 8px;border-radius:4px;cursor:pointer;">Cancel</button>
+    <span id="editBannerMsg" style="margin-left:8px;color:#B39DDB;">You're editing an existing entry — make changes and click Save or Cancel.</span>
+    <button id="cancelEditBtn" style="float:right;background:#2D2A3D;border:1px solid #B39DDB;padding:6px 8px;border-radius:4px;cursor:pointer;color:#FFFFFF;">Cancel</button>
   </div>
 
   <form id="foodForm">
@@ -248,7 +256,7 @@
     </label>
     <details style="margin-top:14px;" open>
       <summary class="mood-summary">Mood</summary>
-      <fieldset style="border:1px solid #eee;padding:10px;border-radius:6px;text-align:left;">
+      <fieldset style="border:1px solid #B39DDB;padding:10px;border-radius:6px;text-align:left;">
       <div style="display:flex;gap:24px;flex-wrap:wrap;">
         <div>
           <div class="mood-cat">🌧️ Negative / distress</div>
@@ -387,7 +395,7 @@
   /* Base container */
   .where-ate{
     margin-top:8px;
-    border:1px solid #eee;
+    border:1px solid #B39DDB;
     padding:8px;
     border-radius:6px;
     text-align:left;       /* ensure left alignment in LTR */
@@ -449,14 +457,13 @@
     </fieldset>
     <label>Who was I with?</label>
       <input type="text" id="company" placeholder="e.g. alone, with friends, with family" />
-    <label>How hungry was I before eating?</label>
-      <div style="display:flex;align-items:center;gap:10px;"><span id="hungerBeforeVal" style="min-width:24px;text-align:center;background:#f0f0f0;padding:4px 8px;border-radius:6px;font-weight:600;color:#333;">5</span><input type="range" id="hungerBefore" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span id="hungerBeforeVal" style="min-width:24px;text-align:center;background:#2D2A3D;padding:4px 8px;border-radius:6px;font-weight:600;color:#FFFFFF;">5</span><input type="range" id="hungerBefore" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
     <label>How mindful was I while eating?</label>
-      <div style="display:flex;align-items:center;gap:10px;"><span id="mindfulVal" style="min-width:24px;text-align:center;background:#f0f0f0;padding:4px 8px;border-radius:6px;font-weight:600;color:#333;">5</span><input type="range" id="mindful" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span id="mindfulVal" style="min-width:24px;text-align:center;background:#2D2A3D;padding:4px 8px;border-radius:6px;font-weight:600;color:#FFFFFF;">5</span><input type="range" id="mindful" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
     <label>How strong was the craving?</label>
-      <div style="display:flex;align-items:center;gap:10px;"><span id="cravingVal" style="min-width:24px;text-align:center;background:#f0f0f0;padding:4px 8px;border-radius:6px;font-weight:600;color:#333;">5</span><input type="range" id="craving" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span id="cravingVal" style="min-width:24px;text-align:center;background:#2D2A3D;padding:4px 8px;border-radius:6px;font-weight:600;color:#FFFFFF;">5</span><input type="range" id="craving" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
     <label>How full did I feel after eating?</label>
-      <div style="display:flex;align-items:center;gap:10px;"><span id="fullAfterVal" style="min-width:24px;text-align:center;background:#f0f0f0;padding:4px 8px;border-radius:6px;font-weight:600;color:#333;">5</span><input type="range" id="fullAfter" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span id="fullAfterVal" style="min-width:24px;text-align:center;background:#2D2A3D;padding:4px 8px;border-radius:6px;font-weight:600;color:#FFFFFF;">5</span><input type="range" id="fullAfter" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
     <label>How did I feel after eating?</label>
       <input type="text" id="afterFeelingText" placeholder="e.g. guilty, satisfied, regretful, content" />
     <label>Do I have any physical symptoms?</label>
