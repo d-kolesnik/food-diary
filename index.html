@@ -512,8 +512,8 @@
     projectId: "food-diary-private",
     storageBucket: "food-diary-private.firebasestorage.app",
     messagingSenderId: "32004598058",
-    appId: "1:32004598058:web:861fe5c7f3604fb1a5d653",
-    measurementId: "G-VDQZ4GV0MW"
+    appId: "1:32004598058:web:8d3398809951a4c4a5d653",
+    measurementId: "G-RTL9YPVK2D"
   };
 
   // Initialize Firebase
@@ -521,14 +521,14 @@
   let auth = null;
   try {
     const app = firebase.initializeApp(firebaseConfig);
-    // db = firebase.firestore();
-    // auth = firebase.auth();
-    // firebase.analytics();
+    db = firebase.firestore();
+    auth = firebase.auth();
+    firebase.analytics();
     // Sign in anonymously
-    // auth.signInAnonymously().catch(error => {
-    //   console.error("Anonymous auth failed: ", error);
-    //   alert("Authentication failed. App will work with local storage only.");
-    // });
+    auth.signInAnonymously().catch(error => {
+      console.error("Anonymous auth failed: ", error);
+      alert("Authentication failed. App will work with local storage only.");
+    });
   } catch (error) {
     console.error("Firebase init failed: ", error);
     alert("Firebase failed to initialize. App will work with local storage only.");
