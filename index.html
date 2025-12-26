@@ -483,7 +483,7 @@
   </div>
 
   <button class="btn-export" id="exportBtn">📊 Export to Excel</button>
-  <button class="btn-export" id="syncBtn">☁️ Sync from Cloud</button>
+  <!-- <button class="btn-export" id="syncBtn">☁️ Sync from Cloud</button> -->
 
   <!-- Image modal / lightbox -->
   <div class="img-modal" id="imgModal" aria-hidden="true">
@@ -501,8 +501,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
-  import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+  import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, deleteDoc,
+    onSnapshot, query, orderBy, serverTimestamp} from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+  import { getAuth, signInAnonymously, onAuthStateChanged,
+    setPersistence, browserLocalPersistence, inMemoryPersistence } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
   import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js';
 
   // Your web app's Firebase configuration
