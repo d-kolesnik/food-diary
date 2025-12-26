@@ -536,7 +536,7 @@
   const closeBtn = document.getElementById('closeBtn');
 
   const now = new Date();
-  dateInput.valueAsDate = now;
+  dateInput.value = now.toISOString().split('T')[0];
   timeInput.value = now.toTimeString().slice(0,5);
 
   let entries = [];
@@ -624,7 +624,7 @@
     editingPhoto = null;
     if (photoPreview) { photoPreview.src = ''; photoPreview.style.display = 'none'; }
     form.reset();
-    dateInput.valueAsDate = new Date();
+    dateInput.value = new Date().toISOString().split('T')[0];
     timeInput.value = new Date().toTimeString().slice(0,5);
     hideEditBanner();
   });
@@ -795,7 +795,7 @@
     renderTable();
 
     form.reset();
-    dateInput.valueAsDate = new Date();
+    dateInput.value = new Date().toISOString().split('T')[0];
     timeInput.value = new Date().toTimeString().slice(0,5);
     // clear editing state and preview
     editingPhoto = null;
