@@ -209,10 +209,10 @@
     .mood-summary { cursor:pointer; font-weight: normal; margin-bottom: 8px; color: #000; }
     summary { color: #fff; }
     .mood-cat { font-weight: normal; margin-bottom: 6px; }
-  .mood-grid { display:grid; grid-template-columns: auto 1fr; row-gap:4px; column-gap:12px; }
-  .mood-item { display: contents; }
-  .mood-checkbox { grid-column: 1; justify-self: start; align-self: center; }
-  .mood-label { grid-column: 2; align-self: center; }
+  .mood-grid { display: flex; flex-direction: column; gap: 4px; }
+  .mood-item { display: flex; align-items: center; gap: 12px; }
+  .mood-checkbox { }
+  .mood-label { }
   .mood-item input { margin:0; }
   </style>
 </head>
@@ -238,52 +238,88 @@
         <div>
           <div class="mood-cat">🌧️ Negative / distress</div>
           <div class="mood-grid">
-            <div class="mood-label">Stressed</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Stressed"></div>
-            <div class="mood-label">Anxious / worried</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Anxious / worried"></div>
-            <div class="mood-label">Angry / frustrated</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Angry / frustrated"></div>
-            <div class="mood-label">Sad / down</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Sad / down"></div>
-            <div class="mood-label">Lonely</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Lonely"></div>
-            <div class="mood-label">Guilty / ashamed</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Guilty / ashamed"></div>
-            <div class="mood-label">Overwhelmed</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Overwhelmed"></div>
-            <div class="mood-label">Irritated</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Irritated"></div>
-            <div class="mood-label">Stressed about work</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Stress about work"></div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Stressed"></div>
+              <div class="mood-label">Stressed</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Anxious / worried"></div>
+              <div class="mood-label">Anxious / worried</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Angry / frustrated"></div>
+              <div class="mood-label">Angry / frustrated</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Sad / down"></div>
+              <div class="mood-label">Sad / down</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Lonely"></div>
+              <div class="mood-label">Lonely</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Guilty / ashamed"></div>
+              <div class="mood-label">Guilty / ashamed</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Overwhelmed"></div>
+              <div class="mood-label">Overwhelmed</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Irritated"></div>
+              <div class="mood-label">Irritated</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Stress about work"></div>
+              <div class="mood-label">Stressed about work</div>
+            </div>
           </div>
         </div>
         <div>
           <div class="mood-cat">😐 Neutral / low-energy</div>
           <div class="mood-grid">
-            <div class="mood-label">Tired / fatigued</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Tired / fatigued"></div>
-            <div class="mood-label">Bored</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Bored"></div>
-            <div class="mood-label">Numb / indifferent</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Numb / indifferent"></div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Tired / fatigued"></div>
+              <div class="mood-label">Tired / fatigued</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Bored"></div>
+              <div class="mood-label">Bored</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Numb / indifferent"></div>
+              <div class="mood-label">Numb / indifferent</div>
+            </div>
           </div>
         </div>
         <div>
           <div class="mood-cat">🌞 Positive</div>
           <div class="mood-grid">
-            <div class="mood-label">Happy</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Happy"></div>
-            <div class="mood-label">Relaxed / calm</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Relaxed / calm"></div>
-            <div class="mood-label">Excited / enthusiastic</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Excited / enthusiastic"></div>
-            <div class="mood-label">Content / satisfied</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Content / satisfied"></div>
-            <div class="mood-label">Proud</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Proud"></div>
-            <div class="mood-label">Focused</div>
-            <div class="mood-checkbox"><input type="checkbox" name="mood" value="Focused"></div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Happy"></div>
+              <div class="mood-label">Happy</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Relaxed / calm"></div>
+              <div class="mood-label">Relaxed / calm</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Excited / enthusiastic"></div>
+              <div class="mood-label">Excited / enthusiastic</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Content / satisfied"></div>
+              <div class="mood-label">Content / satisfied</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Proud"></div>
+              <div class="mood-label">Proud</div>
+            </div>
+            <div class="mood-item">
+              <div class="mood-checkbox"><input type="checkbox" name="mood" value="Focused"></div>
+              <div class="mood-label">Focused</div>
+            </div>
           </div>
         </div>
       </div>
@@ -556,11 +592,23 @@
     if (document.getElementById(id)) return;
     const range = document.createElement('input');
     range.type = 'range'; range.min = 0; range.max = 10; range.value = 5; range.id = id;
-    range.style.display = 'none'; range.style.width = '110px'; range.style.marginLeft = '8px';
+    range.style.display = 'none'; range.style.width = '110px';
     const valSpan = document.createElement('span'); valSpan.id = valId; valSpan.textContent = range.value;
-    valSpan.style.display = 'none'; valSpan.style.marginLeft = '6px';
-    cb.parentNode.appendChild(range);
-    cb.parentNode.appendChild(valSpan);
+    valSpan.style.display = 'none';
+    const item = cb.closest('.mood-item');
+    if (item) {
+      const label = item.querySelector('.mood-label');
+      if (label) {
+        label.after(range);
+        range.after(valSpan);
+      } else {
+        item.appendChild(range);
+        item.appendChild(valSpan);
+      }
+    } else {
+      cb.parentNode.appendChild(range);
+      cb.parentNode.appendChild(valSpan);
+    }
     cb.addEventListener('change', () => {
       if (cb.checked) { range.style.display = 'inline-block'; valSpan.style.display = 'inline-block'; setTimeout(()=>{ try{ range.focus(); }catch(e){} },0); }
       else { range.style.display = 'none'; valSpan.style.display = 'none'; }
