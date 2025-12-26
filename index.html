@@ -9,22 +9,22 @@
     body {
       font-family: 'Montserrat', Arial, sans-serif;
       margin: 20px;
-      background: #121212;
-      color: #EDEDED;
+      background: #F3EFFF;
+      color: #2D2D2D;
       min-height: 100vh;
     }
     h1 {
       text-align: center;
       font-size: 32px;
-      background: linear-gradient(90deg, #9F7AEA, #6A4C93, #4A3F6A);
+      background: linear-gradient(90deg, #7B3FA1, #A678F0, #D6A2E8);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(159, 122, 234, 0.5);
+      text-shadow: 0 0 10px rgba(123, 63, 161, 0.3);
       font-weight: 700;
     }
     form {
       margin-bottom: 20px;
-      background: #4A3F6A;
+      background: #FFFFFF;
       padding: 15px;
       border-radius: 8px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -37,11 +37,11 @@
       width: 100%;
       padding: 8px;
       margin-top: 5px;
-      border: 1px solid #A89BBF;
+      border: 1px solid #A678F0;
       border-radius: 5px;
       box-sizing: border-box;
-      background: #2A2533;
-      color: #EDEDED;
+      background: #FFFFFF;
+      color: #2D2D2D;
     }
     input[type="date"], input[type="time"], input[type="text"], input[type="number"] {
       max-width: 300px;
@@ -49,33 +49,34 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      background: #4A3F6A;
+      background: #FFFFFF;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     th, td {
       padding: 10px;
-      border: 1px solid #A89BBF;
+      border: 1px solid #A678F0;
       text-align: left;
       vertical-align: middle;
     }
     th {
-      background: #6A4C93;
+      background: #7B3FA1;
+      color: #FFFFFF;
     }
     .btn-export {
       margin-top: 20px;
       padding: 10px;
-      background: #6A4C93;
+      background: #7B3FA1;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
     .btn-export:hover {
-      background: #5A3D7A;
+      background: #D6A2E8;
     }
     /* new button accents */
     .btn-add {
-      background: linear-gradient(180deg, #6A4C93, #5A3D7A);
+      background: linear-gradient(180deg, #7B3FA1, #6A2E91);
       color: white;
       border: none;
       padding: 8px 12px;
@@ -93,8 +94,8 @@
     }
     .btn-delete:hover { filter: brightness(0.95); }
     .btn-edit {
-      background: linear-gradient(180deg, #4A3F6A, #3A3255);
-      color: #EDEDED;
+      background: linear-gradient(180deg, #A678F0, #8E5BDD);
+      color: #2D2D2D;
       border: none;
       padding: 6px 10px;
       border-radius: 6px;
@@ -124,23 +125,23 @@
       appearance: none;
       width: 20px;
       height: 20px;
-      background: linear-gradient(135deg, #6A4C93, #5A3D7A);
+      background: linear-gradient(135deg, #7B3FA1, #6A2E91);
       border: 2px solid #fff;
       border-radius: 50%;
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
     input[type="range"]::-webkit-slider-thumb:hover {
-      background: linear-gradient(135deg, #5A3D7A, #4A2E63);
+      background: linear-gradient(135deg, #6A2E91, #5A1F81);
     }
     input[type="range"]::-webkit-slider-thumb:focus {
-      outline: 2px solid #9F7AEA;
+      outline: 2px solid #A678F0;
       outline-offset: 2px;
     }
     input[type="range"]::-moz-range-thumb {
       width: 20px;
       height: 20px;
-      background: linear-gradient(135deg, #6A4C93, #5A3D7A);
+      background: linear-gradient(135deg, #7B3FA1, #6A2E91);
       border: 2px solid #fff;
       border-radius: 50%;
       cursor: pointer;
@@ -148,7 +149,7 @@
       border: none;
     }
     input[type="range"]::-moz-range-thumb:hover {
-      background: linear-gradient(135deg, #5A3D7A, #4A2E63);
+      background: linear-gradient(135deg, #6A2E91, #5A1F81);
     }
     input[type="range"]::-moz-range-thumb:focus {
       outline: 2px solid #4CAF50;
@@ -229,9 +230,9 @@
       cursor: pointer;
     }
     /* Mood layout tweaks */
-    .mood-summary { cursor:pointer; font-weight: normal; margin-bottom: 8px; color: #A89BBF; }
-    summary { color: #A89BBF; }
-    .mood-cat { font-weight: normal; margin-bottom: 6px; color: #EDEDED; }
+    .mood-summary { cursor:pointer; font-weight: normal; margin-bottom: 8px; color: #7A7A7A; }
+    summary { color: #7A7A7A; }
+    .mood-cat { font-weight: normal; margin-bottom: 6px; color: #2D2D2D; }
   .mood-grid { display: flex; flex-direction: column; gap: 4px; }
   .mood-item { display: flex; align-items: center; gap: 12px; }
   .mood-checkbox { }
@@ -241,9 +242,9 @@
 </head>
 <body>
   <h1>⭐ My Food Diary ⭐</h1>
-  <div id="editBanner" style="display:none;background:#4A3F6A;border:1px solid #A89BBF;padding:10px;border-radius:6px;margin-bottom:12px;color:#EDEDED;">
+  <div id="editBanner" style="display:none;background:#FFFFFF;border:1px solid #A678F0;padding:10px;border-radius:6px;margin-bottom:12px;color:#2D2D2D;">
     <strong>Editing entry</strong>
-    <span id="editBannerMsg" style="margin-left:8px;color:#A89BBF;">You're editing an existing entry — make changes and click Save or Cancel.</span>
+    <span id="editBannerMsg" style="margin-left:8px;color:#7A7A7A;">You're editing an existing entry — make changes and click Save or Cancel.</span>
     <button id="cancelEditBtn" style="float:right;background:#2D2A3D;border:1px solid #B39DDB;padding:6px 8px;border-radius:4px;cursor:pointer;color:#FFFFFF;">Cancel</button>
   </div>
 
@@ -256,7 +257,7 @@
     </label>
     <details style="margin-top:14px;" open>
       <summary class="mood-summary">Mood</summary>
-      <fieldset style="border:1px solid #A89BBF;padding:10px;border-radius:6px;text-align:left;">
+      <fieldset style="border:1px solid #A678F0;padding:10px;border-radius:6px;text-align:left;">
       <div style="display:flex;gap:24px;flex-wrap:wrap;">
         <div>
           <div class="mood-cat">🌧️ Negative / distress</div>
@@ -395,7 +396,7 @@
   /* Base container */
   .where-ate{
     margin-top:8px;
-    border:1px solid #A89BBF;
+    border:1px solid #A678F0;
     padding:8px;
     border-radius:6px;
     text-align:left;       /* ensure left alignment in LTR */
@@ -457,13 +458,13 @@
     </fieldset>
     <label>Who was I with?</label>
       <input type="text" id="company" placeholder="e.g. alone, with friends, with family" />
-      <div style="display:flex;align-items:center;gap:10px;"><span id="hungerBeforeVal" style="min-width:24px;text-align:center;background:#2A2533;padding:4px 8px;border-radius:6px;font-weight:600;color:#EDEDED;">5</span><input type="range" id="hungerBefore" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span id="hungerBeforeVal" style="min-width:24px;text-align:center;background:#FFFFFF;padding:4px 8px;border-radius:6px;font-weight:600;color:#2D2D2D;border:1px solid #A678F0;">5</span><input type="range" id="hungerBefore" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
     <label>How mindful was I while eating?</label>
-      <div style="display:flex;align-items:center;gap:10px;"><span id="mindfulVal" style="min-width:24px;text-align:center;background:#2A2533;padding:4px 8px;border-radius:6px;font-weight:600;color:#EDEDED;">5</span><input type="range" id="mindful" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span id="mindfulVal" style="min-width:24px;text-align:center;background:#FFFFFF;padding:4px 8px;border-radius:6px;font-weight:600;color:#2D2D2D;border:1px solid #A678F0;">5</span><input type="range" id="mindful" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
     <label>How strong was the craving?</label>
-      <div style="display:flex;align-items:center;gap:10px;"><span id="cravingVal" style="min-width:24px;text-align:center;background:#2A2533;padding:4px 8px;border-radius:6px;font-weight:600;color:#EDEDED;">5</span><input type="range" id="craving" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span id="cravingVal" style="min-width:24px;text-align:center;background:#FFFFFF;padding:4px 8px;border-radius:6px;font-weight:600;color:#2D2D2D;border:1px solid #A678F0;">5</span><input type="range" id="craving" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
     <label>How full did I feel after eating?</label>
-      <div style="display:flex;align-items:center;gap:10px;"><span id="fullAfterVal" style="min-width:24px;text-align:center;background:#2A2533;padding:4px 8px;border-radius:6px;font-weight:600;color:#EDEDED;">5</span><input type="range" id="fullAfter" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span id="fullAfterVal" style="min-width:24px;text-align:center;background:#FFFFFF;padding:4px 8px;border-radius:6px;font-weight:600;color:#2D2D2D;border:1px solid #A678F0;">5</span><input type="range" id="fullAfter" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
     <label>How did I feel after eating?</label>
       <input type="text" id="afterFeelingText" placeholder="e.g. guilty, satisfied, regretful, content" />
     <label>Do I have any physical symptoms?</label>
@@ -616,7 +617,7 @@
     range.type = 'range'; range.min = 0; range.max = 10; range.value = 5; range.id = id;
     range.style.display = 'none'; range.style.width = '110px';
     const valSpan = document.createElement('span'); valSpan.id = valId; valSpan.textContent = range.value;
-    valSpan.style.display = 'none'; valSpan.style.background = '#2A2533'; valSpan.style.color = '#EDEDED'; valSpan.style.padding = '4px 8px'; valSpan.style.borderRadius = '6px'; valSpan.style.fontWeight = '600';
+    valSpan.style.display = 'none'; valSpan.style.background = '#FFFFFF'; valSpan.style.color = '#2D2D2D'; valSpan.style.padding = '4px 8px'; valSpan.style.borderRadius = '6px'; valSpan.style.fontWeight = '600'; valSpan.style.border = '1px solid #A678F0';
     const item = cb.closest('.mood-item');
     if (item) {
       const label = item.querySelector('.mood-label');
