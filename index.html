@@ -521,14 +521,14 @@
   let auth = null;
   try {
     const app = firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    auth = firebase.auth();
-    firebase.analytics();
+    // db = firebase.firestore();
+    // auth = firebase.auth();
+    // firebase.analytics();
     // Sign in anonymously
-    auth.signInAnonymously().catch(error => {
-      console.error("Anonymous auth failed: ", error);
-      alert("Authentication failed. App will work with local storage only.");
-    });
+    // auth.signInAnonymously().catch(error => {
+    //   console.error("Anonymous auth failed: ", error);
+    //   alert("Authentication failed. App will work with local storage only.");
+    // });
   } catch (error) {
     console.error("Firebase init failed: ", error);
     alert("Firebase failed to initialize. App will work with local storage only.");
