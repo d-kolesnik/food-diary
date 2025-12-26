@@ -536,7 +536,7 @@
   const closeBtn = document.getElementById('closeBtn');
 
   const now = new Date();
-  dateInput.value = now.toISOString().split('T')[0];
+  dateInput.value = now.toLocaleDateString('en-CA');
   timeInput.value = now.toTimeString().slice(0,5);
 
   let entries = [];
@@ -554,9 +554,18 @@
 
   loadEntries();
 
-  // Load entries from localStorage
-  function loadEntries() {
+  // Load entries from localStorage, or from Firebase if localStorage is empty
+  async function loadEntries() {
     entries = JSON.parse(localStorage.getItem('foodEntries') || '[]');
+    if (entries.length === 0) {
+      try {
+        const snapshot = await db.collection("foodEntries").get();
+        entries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        localStorage.setItem('foodEntries', JSON.stringify(entries));
+      } catch (error) {
+        console.error("Error loading entries from Firebase: ", error);
+      }
+    }
     renderTable();
   }
 
@@ -624,7 +633,7 @@
     editingPhoto = null;
     if (photoPreview) { photoPreview.src = ''; photoPreview.style.display = 'none'; }
     form.reset();
-    dateInput.value = new Date().toISOString().split('T')[0];
+    dateInput.value = new Date().toLocaleDateString('en-CA');
     timeInput.value = new Date().toTimeString().slice(0,5);
     hideEditBanner();
   });
@@ -795,7 +804,7 @@
     renderTable();
 
     form.reset();
-    dateInput.value = new Date().toISOString().split('T')[0];
+    dateInput.value = new Date().toLocaleDateString('en-CA');
     timeInput.value = new Date().toTimeString().slice(0,5);
     // clear editing state and preview
     editingPhoto = null;
