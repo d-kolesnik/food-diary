@@ -533,7 +533,7 @@
     });
   } catch (error) {
     console.error("Firebase init failed: ", error);
-    alert("Firebase failed to initialize. App will work with local storage only.");
+    alert("Firebase failed to initialize: " + error.message + ". App will work with local storage only.");
   }
 
   const form = document.getElementById('foodForm');
