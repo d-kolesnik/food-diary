@@ -104,49 +104,64 @@
     input[type="range"] {
       -webkit-appearance: none;
       appearance: none;
-      height: 6px;
-      background: linear-gradient(to right, #ddd 0%, #ddd 100%);
-      border-radius: 3px;
+      height: 10px;
+      background: #e0e0e0;
+      border-radius: 5px;
       outline: none;
       position: relative;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 16px;
-      height: 16px;
-      background: #4CAF50;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, #4CAF50, #388E3C);
+      border: 2px solid #fff;
       border-radius: 50%;
       cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: linear-gradient(135deg, #45a049, #2e7d32);
+    }
+    input[type="range"]::-webkit-slider-thumb:focus {
+      outline: 2px solid #4CAF50;
+      outline-offset: 2px;
     }
     input[type="range"]::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      background: #4CAF50;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, #4CAF50, #388E3C);
+      border: 2px solid #fff;
       border-radius: 50%;
       cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       border: none;
     }
-    /* Add tick marks */
-    input[type="range"] {
-      background: repeating-linear-gradient(to right, #ddd 0, #ddd 1px, transparent 1px, transparent calc(100% / 10));
+    input[type="range"]::-moz-range-thumb:hover {
+      background: linear-gradient(135deg, #45a049, #2e7d32);
+    }
+    input[type="range"]::-moz-range-thumb:focus {
+      outline: 2px solid #4CAF50;
+      outline-offset: 2px;
     }
     /* Add numbers at ends */
     input[type="range"]::before {
       content: "0";
       position: absolute;
-      left: -10px;
-      top: 10px;
+      left: -12px;
+      top: 12px;
       font-size: 12px;
-      color: #000;
+      color: #666;
     }
     input[type="range"]::after {
       content: "10";
       position: absolute;
-      right: -15px;
-      top: 10px;
+      right: -17px;
+      top: 12px;
       font-size: 12px;
-      color: #000;
+      color: #666;
     }
 
     /* stronger heading weight */
@@ -435,13 +450,13 @@
     <label>Who was I with?</label>
       <input type="text" id="company" placeholder="e.g. alone, with friends, with family" />
     <label>How hungry was I before eating?</label>
-      <div style="display:flex;flex-direction:column;gap:4px;"><span id="hungerBeforeVal" style="align-self:flex-start;">5</span><input type="range" id="hungerBefore" min="0" max="10" value="5" style="max-width:225px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span id="hungerBeforeVal" style="min-width:24px;text-align:center;background:#f0f0f0;padding:4px 8px;border-radius:6px;font-weight:600;color:#333;">5</span><input type="range" id="hungerBefore" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
     <label>How mindful was I while eating?</label>
-      <div style="display:flex;flex-direction:column;gap:4px;"><span id="mindfulVal" style="align-self:flex-start;">5</span><input type="range" id="mindful" min="0" max="10" value="5" style="max-width:225px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span id="mindfulVal" style="min-width:24px;text-align:center;background:#f0f0f0;padding:4px 8px;border-radius:6px;font-weight:600;color:#333;">5</span><input type="range" id="mindful" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
     <label>How strong was the craving?</label>
-      <div style="display:flex;flex-direction:column;gap:4px;"><span id="cravingVal" style="align-self:flex-start;">5</span><input type="range" id="craving" min="0" max="10" value="5" style="max-width:225px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span id="cravingVal" style="min-width:24px;text-align:center;background:#f0f0f0;padding:4px 8px;border-radius:6px;font-weight:600;color:#333;">5</span><input type="range" id="craving" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
     <label>How full did I feel after eating?</label>
-      <div style="display:flex;flex-direction:column;gap:4px;"><span id="fullAfterVal" style="align-self:flex-start;">5</span><input type="range" id="fullAfter" min="0" max="10" value="5" style="max-width:225px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span id="fullAfterVal" style="min-width:24px;text-align:center;background:#f0f0f0;padding:4px 8px;border-radius:6px;font-weight:600;color:#333;">5</span><input type="range" id="fullAfter" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
     <label>How did I feel after eating?</label>
       <input type="text" id="afterFeelingText" placeholder="e.g. guilty, satisfied, regretful, content" />
     <label>Do I have any physical symptoms?</label>
