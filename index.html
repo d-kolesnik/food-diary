@@ -516,9 +516,15 @@
   };
 
   // Initialize Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const analytics = firebase.analytics();
+  let db = null;
+  try {
+    const app = firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    firebase.analytics();
+  } catch (error) {
+    console.error("Firebase init failed: ", error);
+    alert("Firebase failed to initialize. App will work with local storage only.");
+  }
 
   const form = document.getElementById('foodForm');
   const groupsContainer = document.getElementById('foodTable');
@@ -557,13 +563,14 @@
   // Load entries from localStorage, or from Firebase if localStorage is empty
   async function loadEntries() {
     entries = JSON.parse(localStorage.getItem('foodEntries') || '[]');
-    if (entries.length === 0) {
+    if (entries.length === 0 && db) {
       try {
         const snapshot = await db.collection("foodEntries").get();
         entries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         localStorage.setItem('foodEntries', JSON.stringify(entries));
       } catch (error) {
         console.error("Error loading entries from Firebase: ", error);
+        alert("Could not load entries from cloud. Check Firestore rules or network.");
       }
     }
     renderTable();
@@ -789,17 +796,21 @@
       // Add new entry to localStorage and Firebase
       entries.push(entry);
       localStorage.setItem('foodEntries', JSON.stringify(entries));
-      db.collection("foodEntries").doc(entry.id.toString()).set(entry).catch(error => {
-        console.error("Error adding to Firebase: ", error);
-      });
+      if (db) {
+        db.collection("foodEntries").doc(entry.id.toString()).set(entry).catch(error => {
+          console.error("Error adding to Firebase: ", error);
+        });
+      }
     } else {
       // Update existing entry in localStorage and Firebase
       entries[editIndex] = entry;
       editIndex = null;
       localStorage.setItem('foodEntries', JSON.stringify(entries));
-      db.collection("foodEntries").doc(entry.id.toString()).update(entry).catch(error => {
-        console.error("Error updating in Firebase: ", error);
-      });
+      if (db) {
+        db.collection("foodEntries").doc(entry.id.toString()).update(entry).catch(error => {
+          console.error("Error updating in Firebase: ", error);
+        });
+      }
     }
     renderTable();
 
@@ -1002,9 +1013,11 @@
       const entryId = entries[index].id;
       entries.splice(index, 1);
       localStorage.setItem('foodEntries', JSON.stringify(entries));
-      db.collection("foodEntries").doc(entryId.toString()).delete().catch(error => {
-        console.error("Error deleting from Firebase: ", error);
-      });
+      if (db) {
+        db.collection("foodEntries").doc(entryId.toString()).delete().catch(error => {
+          console.error("Error deleting from Firebase: ", error);
+        });
+      }
       renderTable();
     }
   };
