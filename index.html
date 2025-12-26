@@ -498,26 +498,7 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
 <script>
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCxXOQ3adb9HQASlvVVUJU2sdVa0mk7ipw",
-    authDomain: "food-diary-b268f.firebaseapp.com",
-    projectId: "food-diary-b268f",
-    storageBucket: "food-diary-b268f.firebasestorage.app",
-    messagingSenderId: "1051342306593",
-    appId: "1:1051342306593:web:2dd1fb4fe8e4ffb7831260",
-    measurementId: "G-LKDW85LD9Z"
-  };
-
-  // Initialize Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
   const form = document.getElementById('foodForm');
   const groupsContainer = document.getElementById('foodTable');
   const exportBtn = document.getElementById('exportBtn');
@@ -552,16 +533,10 @@
 
   loadEntries();
 
-  // Load entries from Firestore
-  async function loadEntries() {
-    try {
-      const snapshot = await db.collection("foodEntries").get();
-      entries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      renderTable();
-    } catch (error) {
-      console.error("Error loading entries: ", error);
-      renderTable(); // render empty if error
-    }
+  // Load entries from localStorage
+  function loadEntries() {
+    entries = JSON.parse(localStorage.getItem('foodEntries') || '[]');
+    renderTable();
   }
 
   // update displayed values for sliders
@@ -780,27 +755,15 @@
     };
 
     if (editIndex === null) {
-      // Add new entry to Firestore
-      db.collection("foodEntries").add(entry).then(docRef => {
-        entry.id = docRef.id;
-        entries.push(entry);
-        renderTable();
-      }).catch(error => {
-        console.error("Error adding entry: ", error);
-        alert('Saving failed. Please try again.');
-      });
+      // Add new entry to localStorage
+      entries.push(entry);
     } else {
-      // Update existing entry in Firestore
-      const entryId = entries[editIndex].id;
-      db.collection("foodEntries").doc(entryId).update(entry).then(() => {
-        entries[editIndex] = entry;
-        editIndex = null;
-        renderTable();
-      }).catch(error => {
-        console.error("Error updating entry: ", error);
-        alert('Saving failed. Please try again.');
-      });
+      // Update existing entry in localStorage
+      entries[editIndex] = entry;
+      editIndex = null;
     }
+    localStorage.setItem('foodEntries', JSON.stringify(entries));
+    renderTable();
 
     form.reset();
     dateInput.valueAsDate = new Date();
@@ -998,14 +961,9 @@
 
   window.deleteEntry = function(index) {
     if (confirm("Are you sure you want to delete this entry?")) {
-      const entryId = entries[index].id;
-      db.collection("foodEntries").doc(entryId).delete().then(() => {
-        entries.splice(index, 1);
-        renderTable();
-      }).catch(error => {
-        console.error("Error deleting entry: ", error);
-        alert('Deletion failed. Please try again.');
-      });
+      entries.splice(index, 1);
+      localStorage.setItem('foodEntries', JSON.stringify(entries));
+      renderTable();
     }
   };
 
