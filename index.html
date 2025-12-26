@@ -501,7 +501,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
   import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
-  import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+  import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
   import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js';
 
   // Your web app's Firebase configuration
@@ -527,6 +527,12 @@
     signInAnonymously(auth).catch(error => {
       console.error("Anonymous auth failed: ", error);
       alert("Authentication failed. App will work with local storage only.");
+    });
+    // Wait for auth state
+    onAuthStateChanged(auth, (user) => {
+      if (user && entries.length === 0) {
+        loadEntries();
+      }
     });
   } catch (error) {
     console.error("Firebase init failed: ", error);
@@ -570,7 +576,7 @@
   // Load entries from localStorage, or from Firebase if localStorage is empty
   async function loadEntries() {
     entries = JSON.parse(localStorage.getItem('foodEntries') || '[]');
-    if (entries.length === 0 && db) {
+    if (entries.length === 0 && db && auth.currentUser) {
       try {
         const querySnapshot = await getDocs(collection(db, "foodEntries"));
         entries = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
