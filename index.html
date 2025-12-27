@@ -608,16 +608,29 @@
 
 
 
-// ✅ Place deleteEntryById() here
-async function deleteEntryById(id) {
-  try {
-    await deleteDoc(doc(db, 'foodEntries', id));
-    console.log('Deleted entry', id);
-  } catch (err) {
-    console.error('Delete failed:', err);
-    alert('Delete failed: ' + (err?.message || err));
+
+  async function deleteEntryById(rawId) {
+    try {
+      // Ensure we pass a string path segment
+      const id = typeof rawId === 'string' ? rawId : String(rawId);
+
+      if (!id) {
+        throw new Error('Missing document id');
+      }
+      if (id.includes('/')) {
+        // Firestore doc IDs must not contain '/'
+        throw new Error(`Invalid document id: "${id}"`);
+      }
+
+      console.log('Deleting Firestore doc id:', id, 'type:', typeof id);
+      await deleteDoc(doc(db, 'foodEntries', id));
+          console.log('Deleted entry', id);
+      // UI will refresh automatically via onSnapshot
+    } catch (err) {
+      console.error('Delete failed:', err);
+      alert('Delete failed: ' + (err?.message || err));
+    }
   }
-}
 
 
   // ✅ Live sync from Firestore
@@ -629,7 +642,7 @@ async function deleteEntryById(id) {
       const serverRows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
       // Simple strategy: replace local array with server data
-      entries = serverRows;
+      entries = snap.docs.map(d => ({ id: d.id, ...d.data() })); // d.id is a string
       renderTable();
 
       // Keep localStorage in sync (optional)
@@ -977,7 +990,11 @@ async function deleteEntryById(id) {
           cardHTML += `<div style="margin-top:8px;"><img src="${entry.photo}" class="photo-thumb" data-index="${idx}" style="margin-top:4px;" /></div>`;
         }
 
-        cardHTML += `<div style="margin-top:8px; display:flex; gap:6px;"><button class="btn-edit" data-action="edit" data-index="${idx}">Edit</button> <button class="btn-delete" data-action="delete" data-index="${idx}">Delete</button></div>`;
+       
+        cardHTML += `<div style="margin-top:8px; display:flex; gap:6px;">
+            editEdit</button>
+            deleteDelete</button>
+          </div>`;
 
         card.innerHTML = cardHTML;
         container.appendChild(card);
@@ -987,31 +1004,32 @@ async function deleteEntryById(id) {
       groupsContainer.appendChild(details);
     });
 
-    // Delegate edit/delete via buttons (use event delegation for robustness)
-    groupsContainer.querySelectorAll('button[data-action="edit"]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = Number(btn.dataset.index);
-        if (!Number.isNaN(idx)) window.editEntry(idx);
-      });
-    });
-
-
-groupsContainer.querySelectorAll('button[data-action="delete"]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const idx = Number(btn.dataset.index);
-    if (!Number.isNaN(idx)) {
-      const id = entries[idx]?.id;
-      if (id) {
-        deleteEntryById(id);
-      } else {
-        console.warn('No Firestore id found for entry at index', idx);
+    // Delegate edit/delete via buttons (use event delegation for robustness)    
+  // Attach once (outside renderTable; or at the end of renderTable if you prefer)
+    groupsContainer.addEventListener('click', (e) => {
+      // Handle Delete
+    const delBtn = e.target.closest('button[data-action="delete"]');
+    if (delBtn) {
+      const rawId = delBtn.dataset.id;    // Firestore doc id string
+      if (!rawId) {
+        console.warn('Delete clicked but no data-id on button', delBtn);
+        return;
       }
-    } else {
-      console.warn('Delete clicked with invalid index:', btn.dataset.index);
+      deleteEntryById(rawId);
+      return; // stop, don't also treat this click as edit
     }
-  });
-});
 
+    // Handle Edit
+    const editBtn = e.target.closest('button[data-action="edit"]');
+    if (editBtn) {
+      const idx = Number(editBtn.dataset.index);
+      if (Number.isNaN(idx)) {
+        console.warn('Edit clicked with invalid index:', editBtn.dataset.index);
+        return;
+      }
+      window.editEntry(idx);
+    }
+    });
 
     // Ensure thumbnails are keyboard-focusable and rely on the delegated handlers
     groupsContainer.querySelectorAll('.photo-thumb').forEach(img => {
