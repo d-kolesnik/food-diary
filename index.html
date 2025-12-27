@@ -992,8 +992,8 @@
 
        
         cardHTML += `<div style="margin-top:8px; display:flex; gap:6px;">
-            editEdit</button>
-            deleteDelete</button>
+            <button data-action="edit" data-index="${idx}">Edit</button>
+            <button data-action="delete" data-id="${idx}">Delete</button>
           </div>`;
 
         card.innerHTML = cardHTML;
