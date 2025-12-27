@@ -605,6 +605,21 @@
     renderTable();
   }
 
+
+
+
+// ✅ Place deleteEntryById() here
+async function deleteEntryById(id) {
+  try {
+    await deleteDoc(doc(db, 'foodEntries', id));
+    console.log('Deleted entry', id);
+  } catch (err) {
+    console.error('Delete failed:', err);
+    alert('Delete failed: ' + (err?.message || err));
+  }
+}
+
+
   // ✅ Live sync from Firestore
   function startServerSync() {
     // If you want ordering, add orderBy('date', 'desc') etc.
@@ -979,12 +994,24 @@
         if (!Number.isNaN(idx)) window.editEntry(idx);
       });
     });
-    groupsContainer.querySelectorAll('button[data-action="delete"]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = Number(btn.dataset.index);
-        if (!Number.isNaN(idx)) window.deleteEntry(idx);
-      });
-    });
+
+
+groupsContainer.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const idx = Number(btn.dataset.index);
+    if (!Number.isNaN(idx)) {
+      const id = entries[idx]?.id;
+      if (id) {
+        deleteEntryById(id);
+      } else {
+        console.warn('No Firestore id found for entry at index', idx);
+      }
+    } else {
+      console.warn('Delete clicked with invalid index:', btn.dataset.index);
+    }
+  });
+});
+
 
     // Ensure thumbnails are keyboard-focusable and rely on the delegated handlers
     groupsContainer.querySelectorAll('.photo-thumb').forEach(img => {
