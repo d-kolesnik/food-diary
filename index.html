@@ -155,23 +155,6 @@
       outline: 2px solid #4CAF50;
       outline-offset: 2px;
     }
-    /* Add numbers at ends */
-    input[type="range"]::before {
-      content: "0";
-      position: absolute;
-      left: -12px;
-      top: 12px;
-      font-size: 12px;
-      color: #666;
-    }
-    input[type="range"]::after {
-      content: "10";
-      position: absolute;
-      right: -17px;
-      top: 12px;
-      font-size: 12px;
-      color: #666;
-    }
 
     /* stronger heading weight */
     h1 { font-weight: 700; }
@@ -454,13 +437,13 @@
     </fieldset>
     <label>Who was I with?</label>
       <input type="text" id="company" placeholder="e.g. alone, with friends, with family" />
-      <div style="display:flex;align-items:center;gap:10px;"><span id="hungerBeforeVal" style="min-width:24px;text-align:center;background:#FFFFFF;padding:4px 8px;border-radius:6px;font-weight:600;color:#2D2D2D;border:1px solid #A678F0;">5</span><input type="range" id="hungerBefore" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><input type="range" id="hungerBefore" min="0" max="10" value="5" style="flex:1;max-width:200px;"><span id="hungerBeforeVal" style="min-width:24px;text-align:center;background:#FFFFFF;padding:4px 8px;border-radius:6px;font-weight:600;color:#2D2D2D;border:1px solid #A678F0;">5</span></div>
     <label>How mindful was I while eating?</label>
-      <div style="display:flex;align-items:center;gap:10px;"><span id="mindfulVal" style="min-width:24px;text-align:center;background:#FFFFFF;padding:4px 8px;border-radius:6px;font-weight:600;color:#2D2D2D;border:1px solid #A678F0;">5</span><input type="range" id="mindful" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><input type="range" id="mindful" min="0" max="10" value="5" style="flex:1;max-width:200px;"><span id="mindfulVal" style="min-width:24px;text-align:center;background:#FFFFFF;padding:4px 8px;border-radius:6px;font-weight:600;color:#2D2D2D;border:1px solid #A678F0;">5</span></div>
     <label>How strong was the craving?</label>
-      <div style="display:flex;align-items:center;gap:10px;"><span id="cravingVal" style="min-width:24px;text-align:center;background:#FFFFFF;padding:4px 8px;border-radius:6px;font-weight:600;color:#2D2D2D;border:1px solid #A678F0;">5</span><input type="range" id="craving" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><input type="range" id="craving" min="0" max="10" value="5" style="flex:1;max-width:200px;"><span id="cravingVal" style="min-width:24px;text-align:center;background:#FFFFFF;padding:4px 8px;border-radius:6px;font-weight:600;color:#2D2D2D;border:1px solid #A678F0;">5</span></div>
     <label>How full did I feel after eating?</label>
-      <div style="display:flex;align-items:center;gap:10px;"><span id="fullAfterVal" style="min-width:24px;text-align:center;background:#FFFFFF;padding:4px 8px;border-radius:6px;font-weight:600;color:#2D2D2D;border:1px solid #A678F0;">5</span><input type="range" id="fullAfter" min="0" max="10" value="5" style="flex:1;max-width:200px;"></div>
+      <div style="display:flex;align-items:center;gap:10px;"><input type="range" id="fullAfter" min="0" max="10" value="5" style="flex:1;max-width:200px;"><span id="fullAfterVal" style="min-width:24px;text-align:center;background:#FFFFFF;padding:4px 8px;border-radius:6px;font-weight:600;color:#2D2D2D;border:1px solid #A678F0;">5</span></div>
     <label>How did I feel after eating?</label>
       <input type="text" id="afterFeelingText" placeholder="e.g. guilty, satisfied, regretful, content" />
     <label>Do I have any physical symptoms?</label>
@@ -483,7 +466,6 @@
   </div>
 
   <button class="btn-export" id="exportBtn">📊 Export to Excel</button>
-  <!-- <button class="btn-export" id="syncBtn">☁️ Sync from Cloud</button> -->
 
   <!-- Image modal / lightbox -->
   <div class="img-modal" id="imgModal" aria-hidden="true">
@@ -499,72 +481,7 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-  import { getFirestore, enableIndexedDbPersistence, collection, addDoc, getDocs, doc, setDoc, updateDoc, deleteDoc,
-    onSnapshot, query, orderBy, serverTimestamp} from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
-  import { getAuth, signInAnonymously, onAuthStateChanged,
-    setPersistence, browserLocalPersistence, inMemoryPersistence } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-  import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js';
-
- 
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyAL75HN918LYXPNSB1sOg3IA-wC5mVJmmk",
-    authDomain: "food-diary-private.firebaseapp.com",
-    projectId: "food-diary-private",
-    storageBucket: "food-diary-private.firebasestorage.app",
-    messagingSenderId: "32004598058",
-    appId: "1:32004598058:web:8d3398809951a4c4a5d653",
-    measurementId: "G-RTL9YPVK2D"
-  };
-
-  // Initialize Firebase
-  let db = null;
-  let auth = null;
-  let entries = [];
-  let unsubscribeEntries = null;
-  try {
-    const app = initializeApp(firebaseConfig);
-    db = getFirestore(app);
-
-
-    // ✅ Multi-tab friendly persistence
-    try {
-      await enableIndexedDbPersistence(db, { synchronizeTabs: true });
-    } catch (err) {
-      console.warn('IndexedDB persistence error:', err);
-    }
-
-    auth = getAuth(app);
-    getAnalytics(app);
-    // Sign in anonymously
-    signInAnonymously(auth).catch(error => {
-      console.error("Anonymous auth failed: ", error);
-      alert("Authentication failed. App will work with local storage only.");
-    });
-    // Wait for auth state
-
-  onAuthStateChanged(auth, (user) => {
-    if (!user) return;
-
-
-      // If we already had a subscription, tear it down first
-      if (typeof unsubscribeEntries === "function") {
-        unsubscribeEntries();
-        unsubscribeEntries = null;
-      }
-
-      // ✅ Start the live subscription to Firestore
-      unsubscribeEntries = startServerSync();
-    });
-
-  } catch (error) {
-    console.error("Firebase init failed: ", error);
-    alert("Firebase failed to initialize: " + error.message + ". App will work with local storage only.");
-  }
-
-
+<script>
   const form = document.getElementById('foodForm');
   const groupsContainer = document.getElementById('foodTable');
   const exportBtn = document.getElementById('exportBtn');
@@ -581,9 +498,10 @@
   const closeBtn = document.getElementById('closeBtn');
 
   const now = new Date();
-  dateInput.value = now.toLocaleDateString('en-CA');
+  dateInput.valueAsDate = now;
   timeInput.value = now.toTimeString().slice(0,5);
 
+  let entries = JSON.parse(localStorage.getItem('foodEntries')) || [];
   let editIndex = null;
   // photo being edited/previewed (data URL)
   let editingPhoto = null;
@@ -596,65 +514,7 @@
   let startX = 0;
   let startY = 0;
 
-  loadEntries();
-
-
-  // --- Initial local load (keep for quick UI, but don't gate Firestore) ---
-  async function loadEntries() {
-    entries = JSON.parse(localStorage.getItem('foodEntries') || '[]');
-    renderTable();
-  }
-
-
-
-
-
-  async function deleteEntryById(rawId) {
-    try {
-      // Ensure we pass a string path segment
-      const id = typeof rawId === 'string' ? rawId : String(rawId);
-
-      if (!id) {
-        throw new Error('Missing document id');
-      }
-      if (id.includes('/')) {
-        // Firestore doc IDs must not contain '/'
-        throw new Error(`Invalid document id: "${id}"`);
-      }
-
-      console.log('Deleting Firestore doc id:', id, 'type:', typeof id);
-      await deleteDoc(doc(db, 'foodEntries', id));
-          console.log('Deleted entry', id);
-      // UI will refresh automatically via onSnapshot
-    } catch (err) {
-      console.error('Delete failed:', err);
-      alert('Delete failed: ' + (err?.message || err));
-    }
-  }
-
-
-  // ✅ Live sync from Firestore
-  function startServerSync() {
-    // If you want ordering, add orderBy('date', 'desc') etc.
-    const q = query(collection(db, "foodEntries"/* your collection name */), /* orderBy('date','desc') */);
-
-    return onSnapshot(q, (snap) => {
-      const serverRows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-      // Simple strategy: replace local array with server data
-      entries = snap.docs.map(d => ({ id: d.id, ...d.data() })); // d.id is a string
-      renderTable();
-
-      // Keep localStorage in sync (optional)
-      localStorage.setItem('foodEntries', JSON.stringify(entries));
-
-      // Debug: see whether it’s cache or server
-      console.log('fromCache?', snap.metadata.fromCache);
-    }, (err) => {
-      console.error('onSnapshot error:', err);
-    });
-  }
-
+  renderTable();
 
   // update displayed values for sliders
   ['hungerBefore','mindful','craving','fullAfter'].forEach(id => {
@@ -720,7 +580,7 @@
     editingPhoto = null;
     if (photoPreview) { photoPreview.src = ''; photoPreview.style.display = 'none'; }
     form.reset();
-    dateInput.value = new Date().toLocaleDateString('en-CA');
+    dateInput.valueAsDate = new Date();
     timeInput.value = new Date().toTimeString().slice(0,5);
     hideEditBanner();
   });
@@ -854,7 +714,6 @@
     }
 
     const entry = {
-      id: editIndex === null ? Date.now() : entries[editIndex].id,
       date: dateInput.value,
       time: timeInput.value,
       mood: getSelectedMoods(),
@@ -873,33 +732,46 @@
     };
 
     if (editIndex === null) {
-      // Add new entry to localStorage and Firebase
       entries.push(entry);
-      localStorage.setItem('foodEntries', JSON.stringify(entries));
-      if (db) {
-        addDoc(collection(db, "foodEntries"), entry).then(docRef => {
-          entry.id = docRef.id;
-          // Update localStorage with the id
-          localStorage.setItem('foodEntries', JSON.stringify(entries));
-        }).catch(error => {
-          console.error("Error adding to Firebase: ", error);
-        });
-      }
     } else {
-      // Update existing entry in localStorage and Firebase
       entries[editIndex] = entry;
       editIndex = null;
+    }
+
+    try {
       localStorage.setItem('foodEntries', JSON.stringify(entries));
-      if (db) {
-        updateDoc(doc(db, "foodEntries", entry.id), entry).catch(error => {
-          console.error("Error updating in Firebase: ", error);
-        });
+      renderTable();
+    } catch (err) {
+      console.warn('localStorage setItem failed, possibly quota exceeded', err);
+      // try fallback: remove photo and save
+      if (entry.photo) {
+        if (confirm('Saving the photo failed (likely too large). Save the entry without the photo?')) {
+          entry.photo = null;
+          if (editIndex === null) {
+            entries[entries.length-1] = entry; // replace last pushed
+          } else {
+            entries[editIndex] = entry;
+          }
+          try {
+            localStorage.setItem('foodEntries', JSON.stringify(entries));
+            renderTable();
+            return;
+          } catch (err2) {
+            console.error('Fallback save failed', err2);
+            alert('Saving failed. Please clear some space in your browser or use smaller photos.');
+            return;
+          }
+        } else {
+          alert('Entry not saved. Try a smaller photo or save without a photo.');
+          return;
+        }
+      } else {
+        alert('Saving failed. Please clear some space in your browser.');
       }
     }
-    renderTable();
 
     form.reset();
-    dateInput.value = new Date().toLocaleDateString('en-CA');
+    dateInput.valueAsDate = new Date();
     timeInput.value = new Date().toTimeString().slice(0,5);
     // clear editing state and preview
     editingPhoto = null;
@@ -990,11 +862,7 @@
           cardHTML += `<div style="margin-top:8px;"><img src="${entry.photo}" class="photo-thumb" data-index="${idx}" style="margin-top:4px;" /></div>`;
         }
 
-       
-        cardHTML += `<div style="margin-top:8px; display:flex; gap:6px;">
-            <button data-action="edit" data-index="${idx}">Edit</button>
-            <button data-action="delete" data-id="${entry.id}">Delete</button>
-          </div>`;
+        cardHTML += `<div style="margin-top:8px; display:flex; gap:6px;"><button class="btn-edit" data-action="edit" data-index="${idx}">Edit</button> <button class="btn-delete" data-action="delete" data-index="${idx}">Delete</button></div>`;
 
         card.innerHTML = cardHTML;
         container.appendChild(card);
@@ -1004,31 +872,18 @@
       groupsContainer.appendChild(details);
     });
 
-    // Delegate edit/delete via buttons (use event delegation for robustness)    
-  // Attach once (outside renderTable; or at the end of renderTable if you prefer)
-    groupsContainer.addEventListener('click', (e) => {
-      // Handle Delete
-    const delBtn = e.target.closest('button[data-action="delete"]');
-    if (delBtn) {
-      const rawId = delBtn.dataset.id;    // Firestore doc id string
-      if (!rawId) {
-        console.warn('Delete clicked but no data-id on button', delBtn);
-        return;
-      }
-      deleteEntryById(rawId);
-      return; // stop, don't also treat this click as edit
-    }
-
-    // Handle Edit
-    const editBtn = e.target.closest('button[data-action="edit"]');
-    if (editBtn) {
-      const idx = Number(editBtn.dataset.index);
-      if (Number.isNaN(idx)) {
-        console.warn('Edit clicked with invalid index:', editBtn.dataset.index);
-        return;
-      }
-      window.editEntry(idx);
-    }
+    // Delegate edit/delete via buttons (use event delegation for robustness)
+    groupsContainer.querySelectorAll('button[data-action="edit"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.dataset.index);
+        if (!Number.isNaN(idx)) window.editEntry(idx);
+      });
+    });
+    groupsContainer.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.dataset.index);
+        if (!Number.isNaN(idx)) window.deleteEntry(idx);
+      });
     });
 
     // Ensure thumbnails are keyboard-focusable and rely on the delegated handlers
@@ -1111,14 +966,8 @@
 
   window.deleteEntry = function(index) {
     if (confirm("Are you sure you want to delete this entry?")) {
-      const entryId = entries[index].id;
       entries.splice(index, 1);
       localStorage.setItem('foodEntries', JSON.stringify(entries));
-      if (db) {
-        deleteDoc(doc(db, "foodEntries", entryId)).catch(error => {
-          console.error("Error deleting from Firebase: ", error);
-        });
-      }
       renderTable();
     }
   };
@@ -1269,12 +1118,6 @@
       modalImage.style.cursor = 'grab';
     }
   });
-  
-  // Optional: clean up when leaving the page
-  window.addEventListener('beforeunload', () => {
-    if (typeof unsubscribeEntries === "function") unsubscribeEntries();
-   });
-
 
   // Touch events for mobile
   modalImage.addEventListener('touchstart', function(e) {
